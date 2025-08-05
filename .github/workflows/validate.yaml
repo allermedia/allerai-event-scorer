@@ -1,0 +1,40 @@
+name: Validate Docker and Terraform on PR
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "scorer/**"
+      - "terraform/**"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA }}
+
+      - name: Validate Docker build
+        run: docker build scorer
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: terraform
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: terraform
+
+      - name: Terraform Plan (no apply)
+        run: terraform plan -input=false
+        working-directory: terraform

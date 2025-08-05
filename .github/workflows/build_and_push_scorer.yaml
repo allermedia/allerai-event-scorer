@@ -1,0 +1,59 @@
+name: Build, Push Docker Image and Deploy with Terraform
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "scorer/**"
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA }}
+
+      - name: Configure Docker client
+        run: |
+          gcloud auth configure-docker europe-docker.pkg.dev
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: scorer
+          push: true
+          tags: europe-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/allerai-scorer:latest
+
+  terraform-deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA }}
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve

@@ -6,5 +6,5 @@ variable "region" {
 }
 variable "image_url" {
   description = "Deployed Cloud Run image URL"
-  default = "europe-docker.pkg.dev/" 
+  default = "europe-docker.pkg.dev" 
 }
