@@ -1,0 +1,20 @@
+# Terraform local state files
+*.tfstate
+*.tfstate.backup
+
+# Crash log files
+crash.log
+
+# .terraform directory (Terraform modules and plugins)
+.terraform/
+
+# Override files (optional)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI configuration files
+.terraformrc
+terraform.rc
+.terraform.lock.hcl

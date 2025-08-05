@@ -1,0 +1,36 @@
+name: Build and Push Scorer Docker Image to Artifact Registry
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "scorer/**"
+
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate with Google Cloud
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA }}
+
+      - name: Configure Docker client
+        run: |
+          gcloud auth configure-docker europe-docker.pkg.dev
+
+      - name: Build and push Docker image
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: docker/build-push-action@v3
+        with:
+          context: scorer
+          push: true
+          tags: europe-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID}}/docker/allerai-scorer:latest

@@ -1,0 +1,3 @@
+- name: allerai-scorer-input-sub
+  topic: allerai-scorer-events
+  push_endpoint: https://allerai-scorer-aller-content-tool.europe-north2.run.app
