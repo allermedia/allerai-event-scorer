@@ -1,3 +1,3 @@
 # Scorer
 
-Coming soon
+Coming soon.
