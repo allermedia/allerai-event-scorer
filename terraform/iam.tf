@@ -7,7 +7,7 @@ resource "google_bigquery_dataset_iam_member" "pubsub_bigquery_access" {
     if contains(keys(s), "bigquery_table")
   }
 
-  dataset_id = split(".", each.value.bigquery_table)[0]
+  dataset_id = each.key
   role       = "roles/bigquery.dataEditor"
   member     = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
 }
