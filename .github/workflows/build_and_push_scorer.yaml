@@ -5,7 +5,10 @@ on:
     branches:
       - main
     paths:
-      - "scorer/**"
+      - .github/workflows/build_and_push_scorer.yaml
+      - "scorer/app/**"
+      - scorer/Dockerfile
+
   workflow_dispatch:
 
 jobs:
