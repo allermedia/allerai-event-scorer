@@ -37,7 +37,5 @@ resource "google_bigquery_table" "tables" {
       type  = time_partitioning.value.type
       field = try(time_partitioning.value.field, null)
     }
-  }
-
-  deletion_protection = false
+ }
 }
