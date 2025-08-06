@@ -29,7 +29,7 @@ resource "google_cloud_run_service" "service" {
       containers {
 
         image = "${var.image_url}/${var.project_id}/docker/${local.cloud_run_config.image}:latest"
-
+        
         resources {
           limits = {
             memory = local.cloud_run_config.resources.memory
