@@ -1,3 +1,11 @@
+locals {
+  subscription_datasets = {
+    for s in local.subscriptions :
+    s.name => split(".", try(s.bigquery_table, ""))[0]
+    if contains(keys(s), "bigquery_table")
+  }
+}
+
 data "google_project" "project" {}
 
 resource "google_bigquery_dataset_iam_member" "pubsub_bigquery_access" {
@@ -6,12 +14,12 @@ resource "google_bigquery_dataset_iam_member" "pubsub_bigquery_access" {
     s.name => s
     if contains(keys(s), "bigquery_table")
   }
-  
-  depends_on = [
-    google_bigquery_dataset.datasets[split(".", each.value.bigquery_table)[0]]
-  ]
 
-  dataset_id = split(".", each.value.bigquery_table)[0]
+  dataset_id = local.subscription_datasets[each.key]
   role       = "roles/bigquery.dataEditor"
   member     = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+
+  depends_on = [
+    google_bigquery_dataset.datasets[local.subscription_datasets[each.key]]
+  ]
 }
