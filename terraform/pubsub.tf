@@ -14,7 +14,6 @@ resource "google_pubsub_subscription" "subscriptions" {
   name  = each.value.name
   topic = google_pubsub_topic.topics[each.value.topic].id
 
-
   dynamic "push_config" {
     for_each = contains(keys(each.value), "push_endpoint") ? [1] : []
     content {
@@ -25,7 +24,12 @@ resource "google_pubsub_subscription" "subscriptions" {
   dynamic "bigquery_config" {
     for_each = contains(keys(each.value), "bigquery_table") ? [1] : []
     content {
-      table = google_bigquery_table.tables[each.value.bigquery_table].id
+      table = format(
+        "%s.%s.%s",
+        var.project_id,
+        split(".", each.value.bigquery_table)[0],
+        google_bigquery_table.tables[each.value.bigquery_table].table_id
+      )
 
       use_topic_schema = false
       write_metadata   = true
@@ -33,4 +37,8 @@ resource "google_pubsub_subscription" "subscriptions" {
   }
 
   ack_deadline_seconds = 10
+
+  depends_on = [
+    google_bigquery_table.tables
+  ]
 }
