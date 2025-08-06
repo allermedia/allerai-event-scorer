@@ -2,4 +2,4 @@
   location: EU
   tables:
     - table_id: tag_scores
-      schema_file: "schemas/tag_scores.json"
+      schema_file: config/schemas/tag_scores.json
