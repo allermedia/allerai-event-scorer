@@ -4,8 +4,8 @@
 
 - name: allerai-scorer-events-bq-sub
   topic: allerai-scorer-events
-  bigquery_table: aller-content-tool:pubsub_events.input_events
+  bigquery_table: pubsub_events.input_events
 
 - name: allerai-scorer-events-push-bq-sub
   topic: allerai-scorer-events-push
-  bigquery_table: aller-content-tool:pubsub_events.output_events
+  bigquery_table: pubsub_events.output_events
