@@ -38,4 +38,6 @@ resource "google_bigquery_table" "tables" {
       field = try(time_partitioning.value.field, null)
     }
   }
+
+  deletion_protection = false
 }
