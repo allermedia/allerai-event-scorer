@@ -39,6 +39,6 @@ resource "google_pubsub_subscription" "subscriptions" {
   ack_deadline_seconds = 10
 
   depends_on = [
-    google_bigquery_dataset_iam_member.pubsub_bigquery_access[each.key]
+    google_bigquery_dataset_iam_member.pubsub_bigquery_access
   ]
 }
