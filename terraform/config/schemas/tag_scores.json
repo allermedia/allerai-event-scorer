@@ -1,0 +1,6 @@
+[
+  { "name": "tag", "type": "STRING", "mode": "REQUIRED" },
+  { "name": "score", "type": "FLOAT", "mode": "REQUIRED" },
+  { "name": "site", "type": "STRING", "mode": "NULLABLE" },
+  { "name": "updated_at", "type": "TIMESTAMP", "mode": "REQUIRED" }
+]

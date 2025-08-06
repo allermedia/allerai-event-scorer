@@ -14,9 +14,21 @@ resource "google_pubsub_subscription" "subscriptions" {
   name  = each.value.name
   topic = google_pubsub_topic.topics[each.value.topic].id
 
-  push_config {
-    push_endpoint = each.value.push_endpoint
+
+  dynamic "push_config" {
+    for_each = contains(keys(each.value), "push_endpoint") ? [1] : []
+    content {
+      push_endpoint = each.value.push_endpoint
+    }
   }
 
+  dynamic "bigquery_config" {
+    for_each = contains(keys(each.value), "bigquery_table") ? [1] : []
+    content {
+      table               = each.value.bigquery_table
+      use_topic_schema    = false
+      write_metadata      = true
+    }
+  }
   ack_deadline_seconds = 10
 }
