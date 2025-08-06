@@ -25,10 +25,12 @@ resource "google_pubsub_subscription" "subscriptions" {
   dynamic "bigquery_config" {
     for_each = contains(keys(each.value), "bigquery_table") ? [1] : []
     content {
-      table               = each.value.bigquery_table
-      use_topic_schema    = false
-      write_metadata      = true
+      table = google_bigquery_table.tables[each.value.bigquery_table].id
+
+      use_topic_schema = false
+      write_metadata   = true
     }
   }
+
   ack_deadline_seconds = 10
 }
