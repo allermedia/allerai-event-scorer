@@ -29,12 +29,7 @@ resource "google_bigquery_table" "tables" {
   dataset_id = google_bigquery_dataset.datasets[each.value.dataset_id].dataset_id
   table_id   = each.value.table_id
 
-  dynamic "schema" {
-    for_each = each.value.schema_file != null ? [each.value.schema_file] : []
-    content {
-      schema = file(schema.value)
-    }
-  }
+  schema = each.value.schema_file != null ? file(each.value.schema_file) : null
 
   dynamic "time_partitioning" {
     for_each = each.value.partitioning != null ? [each.value.partitioning] : []
