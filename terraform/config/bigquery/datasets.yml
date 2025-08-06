@@ -1,3 +1,11 @@
+- dataset_id: pubsub_events
+  location: EU
+  tables:
+    - table_id: input_events
+      schema_file: config/schemas/pubsub.json
+    - table_id: output_events
+      schema_file: config/schemas/pubsub.json
+
 - dataset_id: nordic_tag_scores
   location: EU
   tables:
