@@ -1,3 +1,7 @@
 - name: allerai-scorer-input-sub
   topic: allerai-scorer-events
   push_endpoint: https://allerai-scorer-400287020576.europe-north2.run.app
+
+- name: allerai-scorer-events-bq-sub
+  topic: allerai-scorer-events
+  bigquery_table: aller-content-tool:pubsub_events.input_events
