@@ -10,4 +10,6 @@ resource "google_bigquery_dataset_iam_member" "pubsub_bigquery_access" {
   dataset_id = split(".", each.value.bigquery_table)[0]
   role       = "roles/bigquery.dataEditor"
   member     = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+
+  depends_on = [google_bigquery_dataset.datasets]
 }
