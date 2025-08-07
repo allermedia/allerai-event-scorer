@@ -20,6 +20,7 @@ jobs:
 
       - name: Validate Docker build
         run: docker build scorer
+        run: docker build event_handler
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -33,5 +34,10 @@ jobs:
         working-directory: terraform
 
       - name: Terraform Plan (no apply)
-        run: terraform plan -input=false
+        run: |
+          terraform plan -input=false \
+            -var="env_vars={
+              TARGET_PROJECT_ID=\"${{ secrets.ADP_PROJECT_ID }}\",
+              OUTPUT_TOPIC=\"${{ secrets.ADP_ENRICHMENT_TOPIC }}\"
+            }"
         working-directory: terraform
