@@ -1,6 +1,6 @@
-- name: allerai-scorer-input-sub
+- name: allerai-event-handler-input-sub
   topic: allerai-scorer-events
-  push_endpoint: https://allerai-scorer-400287020576.europe-north2.run.app
+  push_endpoint: https://allerai-event_handler-400287020576.europe-north2.run.app
 
 - name: allerai-scorer-events-bq-sub
   topic: allerai-scorer-events

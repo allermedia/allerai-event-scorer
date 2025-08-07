@@ -15,9 +15,22 @@ locals {
     }
     location        = var.region
     service_account = null
+    env_vars        = {} 
   }
 
   cloud_run_config = merge(local.cloud_run_service_defaults, local.cloudrun)
+  
+  service_env_vars = {
+    for k in local.cloud_run_config.env_vars : k => lookup(var.env_vars, k, null)
+    if lookup(var.env_vars, k, null) != null
+  }
+
+  env_vars_list = [
+    for k, v in local.service_env_vars : {
+      name  = k
+      value = v
+    }
+  ]
 }
 
 resource "google_cloud_run_service" "service" {
@@ -42,6 +55,14 @@ resource "google_cloud_run_service" "service" {
         }
 
         command = local.cloud_run_config.command
+        
+        dynamic "env" {
+          for_each = local.env_vars_list
+          content {
+            name  = env.value.name
+            value = env.value.value
+          }
+        }
       }
 
       service_account_name = local.cloud_run_config.service_account
