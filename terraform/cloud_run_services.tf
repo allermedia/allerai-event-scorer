@@ -43,7 +43,7 @@ resource "google_cloud_run_service" "service" {
         }
 
         ports {
-          container_port = each.value.port
+          container_port = try(each.value.port, local.cloud_run_service_defaults.port)
         }
 
         command = each.value.command
