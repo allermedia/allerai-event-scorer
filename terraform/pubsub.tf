@@ -19,7 +19,7 @@ resource "google_pubsub_subscription" "subscriptions" {
     content {
       push_endpoint = each.value.push_endpoint
       oidc_token {
-        service_account_email = "service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+        service_account_email = "aller-ai-pubsub-sa@aller-content-tool.iam.gserviceaccount.com"
       }
     }
   }
