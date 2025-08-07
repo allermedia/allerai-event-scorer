@@ -31,7 +31,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
-          context: scorer
+          context: event_scorer
           push: true
           tags: europe-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/allerai-scorer:latest
 
