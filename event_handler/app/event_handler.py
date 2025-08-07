@@ -6,6 +6,7 @@ import base64
 from typing import Any, Dict, Optional, Union, List, Tuple
 from datetime import datetime
 import logging
+from google.auth import default
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -26,6 +27,11 @@ class EventHandler:
                 payloads = [payloads]
             elif not isinstance(payloads, list):
                 return jsonify({"status": "error", "reason": "Payload must be JSON object or list"}), 400
+
+
+            credentials, project = default()
+            print(f"Using credentials for project: {project}")
+            print(f"Credentials: {credentials.service_account_email}")
 
             for i, payload in enumerate(payloads):                
                 current_id = payload.get("id", f"index_{i}")
