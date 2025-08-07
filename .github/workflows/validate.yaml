@@ -24,7 +24,7 @@ jobs:
           credentials_json: ${{ secrets.GCP_SA }}
 
       - name: Validate scorer Docker build
-        run: docker build scorer
+        run: docker build event_scorer
 
       - name: Validate event_handler Docker build
         run: docker build event_handler
