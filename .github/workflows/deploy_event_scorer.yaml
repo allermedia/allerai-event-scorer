@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - .github/workflows/deploy_service.yaml
+      - .github/workflows/deploy_event_scorer.yaml
       - "event_scorer/app/**"
       - event_scorer/Dockerfile
 
