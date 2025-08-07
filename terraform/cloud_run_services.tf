@@ -1,6 +1,6 @@
 locals {
-  cloudrun = yamldecode(file("${path.module}/config/cloud_run/services.yml"))
-  
+  cloudrun_services = yamldecode(file("${path.module}/config/cloud_run/services.yml"))
+
   cloud_run_service_defaults = {
     image   = null
     command = ["python", "main.py"]
@@ -15,57 +15,53 @@ locals {
     }
     location        = var.region
     service_account = null
-    env_vars        = {} 
+    env_vars        = []  # just the keys, not values
   }
 
-  cloud_run_config = merge(local.cloud_run_service_defaults, local.cloudrun)
-  
-  service_env_vars = {
-    for k in local.cloud_run_config.env_vars : k => lookup(var.env_vars, k, null)
-    if lookup(var.env_vars, k, null) != null
+  cloudrun_merged = {
+    for service in local.cloudrun_services :
+    service.name => merge(local.cloud_run_service_defaults, service)
   }
-
-  env_vars_list = [
-    for k, v in local.service_env_vars : {
-      name  = k
-      value = v
-    }
-  ]
 }
 
 resource "google_cloud_run_service" "service" {
-  name     = local.cloud_run_config.name
-  location = local.cloud_run_config.location
+  for_each = local.cloudrun_merged
+
+  name     = each.value.name
+  location = each.value.location
 
   template {
     spec {
       containers {
+        image = "${var.image_url}/${var.project_id}/docker/${each.value.image}:latest"
 
-        image = "${var.image_url}/${var.project_id}/docker/${local.cloud_run_config.image}:latest"
-        
         resources {
           limits = {
-            memory = local.cloud_run_config.resources.memory
-            cpu    = local.cloud_run_config.resources.cpu
+            memory = each.value.resources.memory
+            cpu    = each.value.resources.cpu
           }
         }
 
         ports {
-          container_port = local.cloud_run_config.port
+          container_port = each.value.port
         }
 
-        command = local.cloud_run_config.command
-        
+        command = each.value.command
+
         dynamic "env" {
-          for_each = local.env_vars_list
+          for_each = {
+            for k in each.value.env_vars : k => lookup(var.env_vars, k, null)
+            if lookup(var.env_vars, k, null) != null
+          }
+
           content {
-            name  = env.value.name
-            value = env.value.value
+            name  = env.key
+            value = env.value
           }
         }
       }
 
-      service_account_name = local.cloud_run_config.service_account
+      service_account_name = each.value.service_account
     }
   }
 
