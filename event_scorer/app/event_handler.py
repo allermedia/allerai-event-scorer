@@ -6,13 +6,9 @@ import json
 import base64
 
 class EventHandler:
-    def __init__(self, project_id: str, output_topic: str, enrichment_project_id: str, enrichment_topic: str):
+    def __init__(self, project_id: str, output_topic: str):
         self.event_scorer = EventScorer()
-        self.pubsub_service = PubSubService()
-        self.project_id = project_id
-        self.output_topic = output_topic
-        self.enrichment_project_id = enrichment_project_id
-        self.enrichment_topic = enrichment_topic
+        self.pubsub_service = PubSubService(project_id, output_topic)
 
     def process_request(self, request):
         try:
@@ -21,12 +17,8 @@ class EventHandler:
             if payload is None:
                 print("Skipping processing due to invalid JSON payload.")
                 return jsonify({"status": "error", "reason": "Invalid JSON payload"}), 400
-            
-            output_attributes = {
-                "event_source": "ai-platform"
-            }
 
-            self.pubsub_service.publish(self.enrichment_project_id, self.enrichment_topic, payload, output_attributes),
+            #self.pubsub_service.publish(payload)
 
             return jsonify({"status": "queued"}), 202
 
