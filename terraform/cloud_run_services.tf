@@ -3,7 +3,6 @@ locals {
 
   cloud_run_service_defaults = {
     image   = null
-    command = ["python", "main.py"]
     resources = {
       cpu    = "1"
       memory = "512Mi"
@@ -58,13 +57,6 @@ resource "google_cloud_run_service" "service" {
           }
         }
         
-        env {
-          name  = "PORT"
-          value = tostring(try(each.value.port, local.cloud_run_service_defaults.port))
-        }
-        
-        command = each.value.command
-
       }
 
       service_account_name = each.value.service_account
