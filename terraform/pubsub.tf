@@ -42,6 +42,8 @@ resource "google_pubsub_subscription" "subscriptions" {
   ack_deadline_seconds = 10
 
   depends_on = [
-    google_bigquery_dataset_iam_member.pubsub_bigquery_access
+    google_bigquery_dataset_iam_member.pubsub_bigquery_access,
+    google_service_account_iam_member.allow_pubsub_to_impersonate_pubsub_sa,
+    google_service_account_iam_member.allow_terraform_actas_pubsub_sa
   ]
 }
