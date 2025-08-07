@@ -59,7 +59,7 @@ jobs:
             # Update existing service
             gcloud run services update ${SERVICE_NAME} \
               --image=${IMAGE_URL} \
-              --region=${REGION} \
+              --region=${REGION}
           else
             echo "INFO: Service not found. Please deploy service with infrastructure code first."
           fi
