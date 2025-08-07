@@ -5,10 +5,10 @@ on:
     branches:
       - main
     paths:
-      - 'terraform/**'
-      - 'event_scorer/**'
-      - 'event_handler/**'
-      - '.github/workflows/**'
+      - "terraform/**"
+      - "event_scorer/**"
+      - "event_handler/**"
+      - ".github/workflows/**"
 
 jobs:
   validate:
