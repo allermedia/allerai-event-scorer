@@ -22,3 +22,9 @@ resource "google_cloud_run_service_iam_member" "allow_pubsub_push" {
   role     = "roles/run.invoker"
   member   = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
 }
+
+resource "google_service_account_iam_member" "allow_terraform_to_impersonate_pubsub_sa" {
+  service_account_id = "projects/${data.google_project.project.number}/serviceAccounts/service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = "serviceAccount:aller-ai-sa@aller-content-tool.iam.gserviceaccount.com"
+}
