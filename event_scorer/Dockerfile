@@ -9,4 +9,4 @@ COPY app/ ./app/
 
 WORKDIR /app/app
 
-ENTRYPOINT ["python", "main.py"]
+ENTRYPOINT ["functions-framework", "--target", "translate_pages_event", "--port", "8080", "--host", "0.0.0.0"]

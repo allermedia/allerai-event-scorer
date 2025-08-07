@@ -5,10 +5,10 @@ on:
     branches:
       - main
     paths:
-      - 'terraform/**'
-      - 'event_scorer/**'
-      - 'event_handler/**'
-      - '.github/workflows/**'
+      - "terraform/**"
+      - "event_scorer/**"
+      - "event_handler/**"
+      - ".github/workflows/**"
 
 jobs:
   validate:
@@ -23,8 +23,10 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA }}
 
-      - name: Validate Docker build
-        run: docker build scorer
+      - name: Validate scorer Docker build
+        run: docker build event_scorer
+
+      - name: Validate event_handler Docker build
         run: docker build event_handler
 
       - name: Setup Terraform
