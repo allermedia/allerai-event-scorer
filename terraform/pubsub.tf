@@ -18,6 +18,9 @@ resource "google_pubsub_subscription" "subscriptions" {
     for_each = contains(keys(each.value), "push_endpoint") ? [1] : []
     content {
       push_endpoint = each.value.push_endpoint
+      oidc_token {
+        service_account_email = "service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+      }
     }
   }
 
