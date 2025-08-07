@@ -9,4 +9,4 @@ COPY app/ ./app/
 
 WORKDIR /app/app
 
-ENTRYPOINT ["functions-framework", "--target", "process_request", "--port", "8080", "--host", "0.0.0.0"]
+ENTRYPOINT ["functions-framework", "--target", "process_request"]
