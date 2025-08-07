@@ -32,7 +32,7 @@ class EventHandler:
                 logger.info(f"Processing payload with id: {current_id}")
                 try:
                     self.validate_payload(payload)
-                    #self.pubsub_service.publish(payload)
+                    self.pubsub_service.publish(payload)
                     logger.info(f"Published payload with id: {current_id}")
                 except Exception as e:
                     logger.exception(f"Failed to process payload with id {current_id}: {e}")
