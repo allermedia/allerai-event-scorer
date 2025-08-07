@@ -23,8 +23,14 @@ resource "google_cloud_run_service_iam_member" "allow_pubsub_push" {
   member   = "serviceAccount:aller-ai-pubsub-sa@aller-content-tool.iam.gserviceaccount.com"
 }
 
-resource "google_service_account_iam_member" "allow_terraform_to_impersonate_pubsub_sa" {
+resource "google_service_account_iam_member" "allow_pubsub_to_impersonate_pubsub_sa" {
   service_account_id = "projects/${var.project_id}/serviceAccounts/aller-ai-pubsub-sa@aller-content-tool.iam.gserviceaccount.com"
   role               = "roles/iam.serviceAccountTokenCreator"
   member             = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+}
+
+resource "google_service_account_iam_member" "allow_terraform_actas_pubsub_sa" {
+  service_account_id = "projects/${var.project_id}/serviceAccounts/aller-ai-pubsub-sa@aller-content-tool.iam.gserviceaccount.com"
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:aller-ai-sa@aller-content-tool.iam.gserviceaccount.com"
 }
