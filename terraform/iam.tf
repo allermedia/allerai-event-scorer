@@ -20,11 +20,11 @@ resource "google_cloud_run_service_iam_member" "allow_pubsub_push" {
   service  = each.value.name
   location = var.region
   role     = "roles/run.invoker"
-  member   = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+  member   = "serviceAccount:aller-ai-pubsub-sa@aller-content-tool.iam.gserviceaccount.com"
 }
 
 resource "google_service_account_iam_member" "allow_terraform_to_impersonate_pubsub_sa" {
-  service_account_id = "projects/${data.google_project.project.number}/serviceAccounts/service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+  service_account_id = "projects/${data.google_project.project_id}/aller-ai-pubsub-sa@aller-content-tool.iam.gserviceaccount.com"
   role               = "roles/iam.serviceAccountTokenCreator"
-  member             = "serviceAccount:aller-ai-sa@aller-content-tool.iam.gserviceaccount.com"
+  member             = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
 }
