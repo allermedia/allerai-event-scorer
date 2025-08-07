@@ -1,11 +1,11 @@
-- name: allerai-event-handler-input-sub
+- name: allerai-event-handler-input-subscription
   topic: allerai-scorer-events
   push_endpoint: https://allerai-event-handler-400287020576.europe-north2.run.app
 
-- name: allerai-scorer-events-bq-sub
+- name: allerai-scorer-events-bq-subscription
   topic: allerai-scorer-events
   bigquery_table: pubsub_events.input_events
 
-- name: allerai-scorer-events-push-bq-sub
+- name: allerai-scorer-events-push-bq-subscription
   topic: allerai-scorer-events-push
   bigquery_table: pubsub_events.output_events
