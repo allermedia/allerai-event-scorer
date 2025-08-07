@@ -1,3 +1,10 @@
-name: allerai-scorer
-image: allerai-scorer
-service_account: aller-ai-sa@aller-content-tool.iam.gserviceaccount.com
+- name: allerai-scorer
+  image: allerai-scorer
+  service_account: aller-ai-sa@aller-content-tool.iam.gserviceaccount.com
+
+- name: allerai-event-handler
+  image: allerai-event-handler
+  service_account: aller-ai-sa@aller-content-tool.iam.gserviceaccount.com
+  env_vars:
+    - TARGET_PROJECT_ID
+    - OUTPUT_TOPIC
