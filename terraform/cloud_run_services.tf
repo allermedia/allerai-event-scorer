@@ -15,7 +15,7 @@ locals {
     }
     location        = var.region
     service_account = null
-    env_vars        = []  # just the keys, not values
+    env_vars        = []
   }
 
   cloudrun_merged = {
@@ -46,8 +46,6 @@ resource "google_cloud_run_service" "service" {
           container_port = try(each.value.port, local.cloud_run_service_defaults.port)
         }
 
-        command = each.value.command
-
         dynamic "env" {
           for_each = {
             for k in each.value.env_vars : k => lookup(var.env_vars, k, null)
@@ -59,6 +57,14 @@ resource "google_cloud_run_service" "service" {
             value = env.value
           }
         }
+        
+        env {
+          name  = "PORT"
+          value = tostring(try(each.value.port, local.cloud_run_service_defaults.port))
+        }
+        
+        command = each.value.command
+
       }
 
       service_account_name = each.value.service_account
