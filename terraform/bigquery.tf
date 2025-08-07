@@ -7,6 +7,11 @@ resource "google_bigquery_dataset" "datasets" {
 
   dataset_id = each.value.dataset_id
   location   = each.value.location
+  
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes = [schema]
+  }
 }
 
 resource "google_bigquery_table" "tables" {
