@@ -13,3 +13,12 @@ resource "google_bigquery_dataset_iam_member" "pubsub_bigquery_access" {
 
   depends_on = [google_bigquery_dataset.datasets]
 }
+
+resource "google_cloud_run_service_iam_member" "allow_pubsub_push" {
+  for_each = { for svc in local.cloudrun_services : svc.name => svc }
+
+  service  = each.value.name
+  location = var.region
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+}
