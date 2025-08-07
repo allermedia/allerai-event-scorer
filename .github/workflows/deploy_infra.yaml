@@ -32,11 +32,11 @@ jobs:
 
       - name: Terraform Plan
         run: |
-          terraform plan \
-            -var="env_vars={
-              TARGET_PROJECT_ID=\"${{ secrets.ADP_PROJECT_ID }}\",
-              OUTPUT_TOPIC=\"${{ secrets.ADP_ENRICHMENT_TOPIC }}\"
-            }"
+          ENV_VARS="{
+            TARGET_PROJECT_ID = \"${{ secrets.ADP_PROJECT_ID }}\",
+            OUTPUT_TOPIC = \"${{ secrets.ADP_ENRICHMENT_TOPIC }}\"
+          }"
+          terraform plan -var="env_vars=${ENV_VARS}"
         working-directory: terraform
 
       - name: Terraform Apply
@@ -45,6 +45,5 @@ jobs:
             TARGET_PROJECT_ID = \"${{ secrets.ADP_PROJECT_ID }}\",
             OUTPUT_TOPIC = \"${{ secrets.ADP_ENRICHMENT_TOPIC }}\"
           }"
-
           terraform apply -auto-approve -var="env_vars=${ENV_VARS}"
         working-directory: terraform
