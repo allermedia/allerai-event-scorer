@@ -23,8 +23,10 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA }}
 
-      - name: Validate Docker build
+      - name: Validate scorer Docker build
         run: docker build scorer
+
+      - name: Validate event_handler Docker build
         run: docker build event_handler
 
       - name: Setup Terraform
