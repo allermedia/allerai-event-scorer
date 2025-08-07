@@ -26,5 +26,5 @@ resource "google_cloud_run_service_iam_member" "allow_pubsub_push" {
 resource "google_service_account_iam_member" "allow_terraform_to_impersonate_pubsub_sa" {
   service_account_id = "service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
   role               = "roles/iam.serviceAccountTokenCreator"
-  member             = "aller-ai-sa@aller-content-tool.iam.gserviceaccount.com"
+  member             = "serviceAccount:aller-ai-sa@aller-content-tool.iam.gserviceaccount.com"
 }
