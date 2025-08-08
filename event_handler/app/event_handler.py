@@ -1,6 +1,6 @@
 from flask import Response, abort, jsonify
 from pubsub import PubSubService
-from werkzeug.exceptions import BadRequest
+import re
 import json
 import base64
 from typing import Any, Dict, Optional, Union, List, Tuple
@@ -27,11 +27,6 @@ class EventHandler:
                 payloads = [payloads]
             elif not isinstance(payloads, list):
                 return jsonify({"status": "error", "reason": "Payload must be JSON object or list"}), 400
-
-
-            credentials, project = default()
-            print(f"Using credentials for project: {project}")
-            print(f"Credentials: {credentials.service_account_email}")
 
             for i, payload in enumerate(payloads):                
                 current_id = payload.get("id", f"index_{i}")
@@ -68,7 +63,6 @@ class EventHandler:
         attributes = message.get("attributes", {})
 
         return payload, attributes
-    
         
     def validate_payload(self, payload: Dict[str, Any]) -> None:
         required_fields = ["id", "published", "site", "teaser", "title", "body"]
@@ -76,21 +70,19 @@ class EventHandler:
         for field in required_fields:
             if field not in payload:
                 raise ValueError(f"Missing required field: {field}")
-            if not isinstance(payload[field], str) and field != "published":
+            if not isinstance(payload[field], str):
                 raise ValueError(f"Field '{field}' must be a string")
 
-        # Validate 'published' format
-        published = payload["published"]
+        published_str = payload["published"]
 
-        if not isinstance(published, dict) or "$date" not in published:
-            raise ValueError("Field 'published' must be a dict with a '$date' key")
-
-        date_str = published["$date"]
-        if not isinstance(date_str, str):
-            raise ValueError("Field 'published[\"$date\"]' must be a string")
+        match = re.search(r"\$date['\"]?\s*:\s*['\"]([^'\"]+)['\"]", published_str)
+        if match:
+            date_str = match.group(1)
+        else:
+            date_str = published_str
 
         try:
-            # Validate ISO 8601 format with optional milliseconds and timezone
             datetime.fromisoformat(date_str.replace("Z", "+00:00"))
         except ValueError:
             raise ValueError(f"Invalid ISO 8601 datetime format: {date_str}")
+        
