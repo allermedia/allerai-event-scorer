@@ -21,7 +21,9 @@ class DataManager:
         
         credentials, self.project_id = google.auth.default()
         self.client_articles, self.articles_project_id = self.get_source_client(self.project_id)
-
+        
+        threading.Thread(target=self.refresh_cache, daemon=True).start()
+        
     def _fetch_articles(self) -> pd.DataFrame:
         sql = f"""
         WITH ranked_articles AS (
@@ -35,6 +37,7 @@ class DataManager:
             ROW_NUMBER() OVER (PARTITION BY site_domain ORDER BY published_ts DESC) AS rn
         FROM `{self.articles_project_id}.editorial.pages`
         WHERE page_type = 'Article'
+        AND text_embeddings_en IS NOT NULL
         )
         SELECT 
         article_id, 
