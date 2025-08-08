@@ -1,6 +1,7 @@
 from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 import numpy as np
+import traceback
 
 class EventScorer:
     def __init__(self):
@@ -9,6 +10,10 @@ class EventScorer:
     def embedding_relevance(self, df_event, df_articles, top_n=10):
         try:
             event_id = df_event["article_id"].iloc[0]
+            
+            if "embeddings_en" not in df_event.columns:
+                raise ValueError("Missing 'embeddings_en' in event payload.")
+
             event_embedding = df_event["embeddings_en"].iloc[0]
 
             if event_embedding is None or len(event_embedding) == 0:
@@ -17,7 +22,9 @@ class EventScorer:
             event_embedding = np.array(event_embedding, dtype=np.float32)
 
             valid_articles = df_articles.dropna(subset=["embeddings_en"]).copy()
-            valid_articles = valid_articles[valid_articles["embeddings_en"].map(lambda x: x and len(x) > 0)]
+            valid_articles = valid_articles[valid_articles["embeddings_en"].map(
+                lambda x: isinstance(x, (list, np.ndarray)) and len(x) > 0
+            )]
 
             if valid_articles.empty:
                 return pd.DataFrame(columns=["id", "site_domain", "embedding_similarity"])
@@ -50,6 +57,7 @@ class EventScorer:
 
         except Exception as e:
             print(f"Exception in embedding_relevance: {e}")
+            traceback.print_exc()
             raise
 
     def compute_cosine_similarity(self, event_embedding, candidate_embeddings, candidate_article_ids, candidate_sites):
