@@ -21,6 +21,16 @@ class EventScorer:
 
             event_embedding = np.array(event_embedding, dtype=np.float32)
 
+            print(f"Original articles shape: {df_articles.shape}")
+            print(df_articles.columns.tolist())
+            print(df_articles.head(3))
+            print("embeddings_en column types in df_articles:")
+            print(df_articles["embeddings_en"].apply(type).value_counts())
+            print("Sample embeddings:")
+            print(df_articles["embeddings_en"].head(3).tolist())
+
+            df_articles["embeddings_en"] = df_articles["embeddings_en"].map(lambda x: list(x) if x is not None else None)
+
             valid_articles = df_articles.dropna(subset=["embeddings_en"]).copy()
             valid_articles = valid_articles[valid_articles["embeddings_en"].map(
                 lambda x: isinstance(x, (list, np.ndarray)) and len(x) > 0
@@ -54,7 +64,7 @@ class EventScorer:
                     "site_domain": site,
                     "embedding_similarity": top_scores_mean
                 })
-                
+
             if not results:
                 raise ValueError(f"No similarity scores computed for event_id {event_id}. Check if candidate embeddings were empty.")
 
