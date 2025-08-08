@@ -29,7 +29,9 @@ class EventHandler:
             df_tag_scores = dfs["tag_scores"]
             #scoring
             print("Scoring event...")
-            payload = self.event_scorer.embedding_relevance(df_event, df_articles)
+
+            df_payload = self.event_scorer.embedding_relevance(df_event, df_articles)
+            payload = df_payload.to_dict(orient="records")
                         
             self.pubsub_service.publish(payload, attributes)
 
