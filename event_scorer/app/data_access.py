@@ -7,6 +7,7 @@ from google.oauth2 import service_account
 import os
 import google.auth
 import traceback
+from numpy import np
 
 
 # Module-level globals for cache and timestamps
@@ -101,7 +102,8 @@ class DataManager:
 
     def validate_embeddings_column(self, df: pd.DataFrame) -> pd.DataFrame:
         def safe_pass(x):
-            if isinstance(x, list) and all(isinstance(i, (float, int)) for i in x):
+            if (isinstance(x, (list, np.ndarray)) and
+                all(isinstance(i, (float, int, np.floating, np.integer)) for i in x)):
                 return x
             return None
 
