@@ -6,6 +6,8 @@ from google.cloud import secretmanager
 from google.oauth2 import service_account
 import os
 import google.auth
+import traceback
+
 
 # Module-level globals for cache and timestamps
 _cached_articles = None
@@ -66,26 +68,36 @@ class DataManager:
 
     def refresh_cache(self):
         global _cached_articles, _cached_tag_scores, _last_refresh
-        print("Refreshing cache for all tables...")
-        _cached_articles = self._fetch_articles()
-        _cached_tag_scores = self._fetch_tag_scores()
-        _last_refresh = time.time()
-        print(f"Cache refreshed at {time.ctime(_last_refresh)}")
+        try:
+            print("Refreshing cache for all tables...")
+            _cached_articles = self._fetch_articles()
+            _cached_tag_scores = self._fetch_tag_scores()
+            _last_refresh = time.time()
+            print(f"Cache refreshed at {time.ctime(_last_refresh)}")
+        except Exception as e:
+            print("Exception during cache refresh:", e)
+            print(traceback.format_exc())
+            raise
+
 
     def get_dataframes(self):
         global _cached_articles, _cached_tag_scores, _last_refresh
-        now = time.time()
-        if (_cached_articles is None or _cached_tag_scores is None
-                or (now - _last_refresh) > self.refresh_interval):
-            print("Cache stale or empty. Refreshing cache...")
-            self.refresh_cache()
-        else:
-            print("Using cached dataframes")
-        # Return copies to avoid mutation issues
-        return {
-            "articles": _cached_articles.copy() if _cached_articles is not None else None,
-            "tag_scores": _cached_tag_scores.copy() if _cached_tag_scores is not None else None,
-        }
+        try:
+            now = time.time()
+            if (_cached_articles is None or _cached_tag_scores is None
+                    or (now - _last_refresh) > self.refresh_interval):
+                print("Cache stale or empty. Refreshing cache...")
+                self.refresh_cache()
+            else:
+                print("Using cached dataframes")
+            return {
+                "articles": _cached_articles.copy() if _cached_articles is not None else None,
+                "tag_scores": _cached_tag_scores.copy() if _cached_tag_scores is not None else None,
+            }
+        except Exception as e:
+            print("Exception during get_dataframes:", e)
+            print(traceback.format_exc())
+            raise
 
     def validate_embeddings_column(self, df: pd.DataFrame) -> pd.DataFrame:
         def safe_pass(x):
