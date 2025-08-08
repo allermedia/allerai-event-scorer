@@ -25,10 +25,12 @@ class EventScorer:
             valid_articles = valid_articles[valid_articles["embeddings_en"].map(
                 lambda x: isinstance(x, (list, np.ndarray)) and len(x) > 0
             )]
+            
+            print(f"Valid articles shape: {valid_articles.shape}")
 
             if valid_articles.empty:
-                return pd.DataFrame(columns=["id", "site_domain", "embedding_similarity"])
-
+                raise ValueError("No valid articles found with non-empty embeddings")
+            
             results = []
             grouped_articles = valid_articles.groupby("site_domain")
 
@@ -52,6 +54,9 @@ class EventScorer:
                     "site_domain": site,
                     "embedding_similarity": top_scores_mean
                 })
+                
+            if not results:
+                raise ValueError(f"No similarity scores computed for event_id {event_id}. Check if candidate embeddings were empty.")
 
             return pd.DataFrame(results)
 
