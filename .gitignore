@@ -19,3 +19,8 @@ override.tf.json
 terraform.rc
 .terraform.lock.hcl
 tfplan
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
