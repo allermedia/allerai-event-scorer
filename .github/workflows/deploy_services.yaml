@@ -6,10 +6,8 @@ on:
       - main
     paths:
       - .github/workflows/deploy_services.yaml
-      - "event_scorer/app/**"
-      - event_scorer/Dockerfile
-      - "event_handler/app/**"
-      - event_handler/Dockerfile
+      - "event_scorer/**"
+      - "event_handler/**"
 
   workflow_dispatch:
 
