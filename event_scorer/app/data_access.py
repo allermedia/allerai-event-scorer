@@ -7,7 +7,7 @@ from google.oauth2 import service_account
 import os
 import google.auth
 import traceback
-from numpy import np
+import numpy as np
 
 
 # Module-level globals for cache and timestamps
