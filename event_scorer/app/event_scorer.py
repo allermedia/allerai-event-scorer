@@ -11,7 +11,7 @@ class EventScorer:
             event_id = df_event["article_id"].iloc[0]
             event_embedding = df_event["embeddings_en"].iloc[0]
 
-            if not event_embedding or len(event_embedding) == 0:
+            if event_embedding is None or len(event_embedding) == 0:
                 raise ValueError(f"Event embedding is null or empty for article_id {event_id}")
 
             event_embedding = np.array(event_embedding, dtype=np.float32)
