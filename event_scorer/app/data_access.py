@@ -1,5 +1,4 @@
 import time
-import threading
 import pandas as pd
 from google.cloud import bigquery
 import json
@@ -8,22 +7,19 @@ from google.oauth2 import service_account
 import os
 import google.auth
 
+# Module-level globals for cache and timestamps
+_cached_articles = None
+_cached_tag_scores = None
+_last_refresh = 0
+
 class DataManager:
     def __init__(self, refresh_interval_seconds=3600):
         self.refresh_interval = refresh_interval_seconds
-        self.cache = {
-            "articles": None,
-            "tag_scores": None,
-        }
-        self.last_refresh = 0
-        self.lock = threading.Lock()
-        self.client = bigquery.Client()
         
         credentials, self.project_id = google.auth.default()
+        self.client = bigquery.Client()
         self.client_articles, self.articles_project_id = self.get_source_client(self.project_id)
-        
-        threading.Thread(target=self.refresh_cache, daemon=True).start()
-        
+
     def _fetch_articles(self) -> pd.DataFrame:
         sql = f"""
         WITH ranked_articles AS (
@@ -69,23 +65,28 @@ class DataManager:
         return df
 
     def refresh_cache(self):
-        with self.lock:
-            print("Refreshing cache for all tables...")
-            self.cache["articles"] = self._fetch_articles()
-            self.cache["tag_scores"] = self._fetch_tag_scores()
-            self.last_refresh = time.time()
-            print(f"Cache refreshed at {time.ctime(self.last_refresh)}")
+        global _cached_articles, _cached_tag_scores, _last_refresh
+        print("Refreshing cache for all tables...")
+        _cached_articles = self._fetch_articles()
+        _cached_tag_scores = self._fetch_tag_scores()
+        _last_refresh = time.time()
+        print(f"Cache refreshed at {time.ctime(_last_refresh)}")
 
     def get_dataframes(self):
-        with self.lock:
-            now = time.time()
-            if any(df is None for df in self.cache.values()) or (now - self.last_refresh) > self.refresh_interval:
-                print("Cache stale or empty. Refreshing cache...")
-                self.refresh_cache()
-            else:
-                print("Using cached dataframes")
-            return {k: v.copy() for k, v in self.cache.items()}
-    
+        global _cached_articles, _cached_tag_scores, _last_refresh
+        now = time.time()
+        if (_cached_articles is None or _cached_tag_scores is None
+                or (now - _last_refresh) > self.refresh_interval):
+            print("Cache stale or empty. Refreshing cache...")
+            self.refresh_cache()
+        else:
+            print("Using cached dataframes")
+        # Return copies to avoid mutation issues
+        return {
+            "articles": _cached_articles.copy() if _cached_articles is not None else None,
+            "tag_scores": _cached_tag_scores.copy() if _cached_tag_scores is not None else None,
+        }
+
     def validate_embeddings_column(self, df: pd.DataFrame) -> pd.DataFrame:
         def safe_pass(x):
             if isinstance(x, list) and all(isinstance(i, (float, int)) for i in x):
