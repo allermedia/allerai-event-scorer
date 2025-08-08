@@ -2,6 +2,10 @@
   topic: allerai-scorer-events
   push_endpoint: https://allerai-event-handler-400287020576.europe-north2.run.app
 
+- name: allerai-enrichment-push-test-subscription
+  topic: allerai-enrichment-push-test
+  push_endpoint: https://allerai-scorer-400287020576.europe-north2.run.app
+
 - name: allerai-scorer-events-bq-subscription
   topic: allerai-scorer-events
   bigquery_table: pubsub_events.input_events

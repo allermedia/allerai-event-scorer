@@ -1,6 +1,8 @@
 - name: allerai-scorer
   image: allerai-scorer
   service_account: aller-ai-sa@aller-content-tool.iam.gserviceaccount.com
+  env_vars:
+    - ADP_SECRET_NAME
 
 - name: allerai-event-handler
   image: allerai-event-handler
