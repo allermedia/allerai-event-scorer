@@ -5,7 +5,7 @@ locals {
     image   = null
     resources = {
       cpu    = "1"
-      memory = "512Mi"
+      memory = "2Gi"
     }
     port = 8080
     scaling = {
