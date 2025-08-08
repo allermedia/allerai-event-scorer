@@ -1,19 +1,28 @@
-name: Build, Push Docker Image and Deploy with Terraform
+name: Build, Push, and Deploy Docker Services
 
 on:
   push:
     branches:
       - main
     paths:
-      - .github/workflows/deploy_event_scorer.yaml
+      - .github/workflows/deploy_services.yaml
       - "event_scorer/app/**"
       - event_scorer/Dockerfile
+      - "event_handler/app/**"
+      - event_handler/Dockerfile
 
   workflow_dispatch:
 
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - name: allerai-scorer
+            folder: event_scorer
+          - name: allerai-event-handler
+            folder: event_handler
 
     steps:
       - name: Checkout code
@@ -31,32 +40,22 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
-          context: event_scorer
+          context: ${{ matrix.service.folder }}
           push: true
-          tags: europe-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/allerai-scorer:latest
-
-  update-service:
-    runs-on: ubuntu-latest
-    needs: build-and-push
-
-    steps:
-      - name: Authenticate with Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_SA }}
+          tags: europe-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/${{ matrix.service.name }}:latest
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Deploy new image to Cloud Run
         run: |
-          SERVICE_NAME="allerai-scorer"
-          IMAGE_URL="europe-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/allerai-scorer:latest"
-          REGION=europe-north2
+          SERVICE_NAME="${{ matrix.service.name }}"
+          IMAGE_URL="europe-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/${{ matrix.service.name }}:latest"
+          REGION="europe-north2"
 
-          # Check if the service already exists
+          echo "Deploying $SERVICE_NAME with image $IMAGE_URL..."
+
           if gcloud run services describe ${SERVICE_NAME} --region=${REGION} &> /dev/null; then
-            # Update existing service
             gcloud run services update ${SERVICE_NAME} \
               --image=${IMAGE_URL} \
               --region=${REGION}
