@@ -6,7 +6,6 @@ import base64
 from typing import Any, Dict, Optional, Union, List, Tuple
 from datetime import datetime
 import logging
-from google.auth import default
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
