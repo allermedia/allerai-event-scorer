@@ -31,12 +31,9 @@ class EventHandler:
             for i, payload in enumerate(payloads):                
                 current_id = payload.get("id", f"index_{i}")
                 logger.info(f"Processing payload with id: {current_id}")
-                try:
-                    self.validate_payload(payload)
-                    self.pubsub_service.publish(payload)
-                    logger.info(f"Published payload with id: {current_id}")
-                except Exception as e:
-                    logger.exception(f"Failed to process payload with id {current_id}: {e}")
+                self.validate_payload(payload)
+                self.pubsub_service.publish(payload)
+                logger.info(f"Published payload with id: {current_id}")
 
             return jsonify({"status": "success", "processed_count": len(payloads)}), 202
     
