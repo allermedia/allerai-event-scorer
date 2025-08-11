@@ -53,12 +53,6 @@ class EventHandler:
             self.pubsub_service.publish(payload, attributes)
 
             return jsonify({"status": "success"}), 202      
-            
-        except ValueError as e:
-            logger.error(f"ValueError: {e}")
-            error_log = self.error_formatter(payload, message_id, e)            
-            self.pubsub_service_error_log.publish(error_log)
-            return jsonify({"error": str(e)}), 200
         
         except Exception as e:   
             logger.error(f"Error: {e}")         
@@ -68,16 +62,13 @@ class EventHandler:
     
     def error_formatter(self, payload: Dict[str, Any], message_id: str, e: Exception) -> Dict[str, Any]:
         try:
-            article_id = payload.get("article_id")
-            if article_id is None:
-                raise KeyError("article_id not found in payload")
+            article_id = payload.get("article_id") if payload else None
         except (AttributeError, KeyError):
             article_id = None
 
         error_log = {
-            "message_id": message_id,
+            "message_id": message_id or None,
             "article_id": article_id,
             "error": str(e)
         }
-
         return error_log
