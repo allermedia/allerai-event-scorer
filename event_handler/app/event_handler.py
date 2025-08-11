@@ -52,7 +52,7 @@ class EventHandler:
                 "error": str(e)
             }
             
-            self.pubsub_service_error_log.publish(error_log, {})
+            self.pubsub_service_error_log.publish(error_log)
             return jsonify({"error": str(e)}), 200
         
         except Exception as e:
