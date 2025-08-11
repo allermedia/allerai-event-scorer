@@ -30,7 +30,7 @@ class EventHandler:
                 logger.info(f"Processing payload with id: {current_id}")
                 self.request_parser.validate_payload(payload)
                 self.pubsub_service.publish(payload)
-                logger.info(f"Published payload with id: {current_id}")
+                logger.info(f"Published payload for enrichment with id: {current_id}")
             
             return jsonify({"status": "success", "processed_count": len(payloads)}), 202
 
