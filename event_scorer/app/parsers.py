@@ -26,6 +26,8 @@ class RequestParser:
         return payload, attributes
 
     def payload_to_df(self, payload: dict) -> pd.DataFrame:
+        if not isinstance(payload, dict):
+            raise ValueError("Payload must be a dictionary.")
         emb = payload.get("embeddings_en")
         if not isinstance(emb, list) or not emb or not all(isinstance(x, (float, int)) for x in emb):
             raise ValueError("Event embedding is missing or invalid.")
