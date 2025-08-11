@@ -6,6 +6,7 @@ from models.classification import ClassificationScorer
 from data_access import DataManager
 from parsers import RequestParser
 from pubsub import PubSubService
+from typing import Any, Dict
 import logging
 
 logger = logging.getLogger(__name__)
@@ -21,6 +22,9 @@ class EventHandler:
         self.pubsub_service_error_log = PubSubService(project_id, output_topic_error_log)
 
     def process_request(self, request):
+        payload = None
+        message_id = None
+
         try:
             payload, attributes, message_id = self.request_parser.parse_request(request)
 
@@ -48,30 +52,32 @@ class EventHandler:
                         
             self.pubsub_service.publish(payload, attributes)
 
-            return jsonify({"status": "success"}), 202
-
-        except ValueError as e:
-            print(f"Bad request {message_id}: {e}")
-            try:
-                article_id = payload.get("article_id")
-                if article_id is None:
-                    raise KeyError("article_id not found in payload")
-            except (AttributeError, KeyError):
-                article_id = None
-
-            error_log = {
-                "message_id": message_id,
-                "article_id": article_id,
-                "error": str(e)
-            }
+            return jsonify({"status": "success"}), 202      
             
-            self.pubsub_service_error_log.publish(error_log, {})
+        except ValueError as e:
+            logger.error(f"ValueError: {e}")
+            error_log = self.error_formatter(payload, message_id, e)            
+            self.pubsub_service_error_log.publish(error_log)
             return jsonify({"error": str(e)}), 200
+        
+        except Exception as e:   
+            logger.error(f"Error: {e}")         
+            error_log = self.error_formatter(payload, message_id, e)            
+            self.pubsub_service_error_log.publish(error_log)
+            return jsonify({"error": str(e)}), 200
+    
+    def error_formatter(self, payload: Dict[str, Any], message_id: str, e: Exception) -> Dict[str, Any]:
+        try:
+            article_id = payload.get("article_id")
+            if article_id is None:
+                raise KeyError("article_id not found in payload")
+        except (AttributeError, KeyError):
+            article_id = None
 
-        except Exception as e:
-            print(f"Error processing message {message_id}: {e}")
-            error_log = {
-                "message_id": message_id,
-                "error": str(e)
-            }
-            return jsonify({"error": str(e)}), 500   
+        error_log = {
+            "message_id": message_id,
+            "article_id": article_id,
+            "error": str(e)
+        }
+
+        return error_log
