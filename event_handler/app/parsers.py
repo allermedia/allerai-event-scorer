@@ -14,6 +14,9 @@ class RequestParser:
             raise ValueError("No Pub/Sub message received")
 
         message = envelope["message"]
+        attributes = message.get("attributes", {})
+        message_id = message.get("messageId") or None
+
         data = message.get("data")
         if not data:
             raise ValueError("No data in Pub/Sub message")

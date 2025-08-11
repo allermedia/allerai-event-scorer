@@ -14,7 +14,7 @@ class EventHandler:
         self.pubsub_service_error_log = PubSubService(project_id, output_topic_error_log)
 
     def process_request(self, request) -> Tuple[Optional[Any], Dict[str, Any]]:
-        payload = None
+        payloads = None
         message_id = None
 
         try:
@@ -35,7 +35,7 @@ class EventHandler:
             return jsonify({"status": "success", "processed_count": len(payloads)}), 202
 
         except Exception as e:
-            error_log = self.error_formatter(payload, message_id, e)
+            error_log = self.error_formatter(payloads, message_id, e)
             self.pubsub_service_error_log.publish(error_log)
             return jsonify({"error": str(e)}), 200
 

@@ -13,6 +13,9 @@ class RequestParser:
             raise ValueError("No Pub/Sub message received")
 
         message = envelope["message"]
+        attributes = message.get("attributes", {})
+        message_id = message.get("messageId") or None
+
         data = message.get("data")
         if not data:
             raise ValueError("No data in Pub/Sub message")
@@ -21,9 +24,6 @@ class RequestParser:
             payload = json.loads(base64.b64decode(data).decode("utf-8"))
         except json.JSONDecodeError as e:
             raise ValueError(f"JSON decoding error: {e}")
-
-        attributes = message.get("attributes", {})
-        message_id = message.get("messageId") or None
 
         return payload, attributes, message_id
 
