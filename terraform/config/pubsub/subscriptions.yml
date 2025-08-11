@@ -10,6 +10,14 @@
   topic: allerai-scorer-events
   bigquery_table: pubsub_events.input_events
 
+- name: allerai-scorer-events-error-log-bq-subscription
+  topic: allerai-scorer-events-error-log
+  bigquery_table: pubsub_events.input_events_error_log
+
 - name: allerai-scorer-events-push-bq-subscription
   topic: allerai-scorer-events-push
   bigquery_table: pubsub_events.output_events
+
+- name: allerai-scorer-events-push-error-log-bq-subscription
+  topic: allerai-scorer-events-push-error-log
+  bigquery_table: pubsub_events.output_events_error_log
