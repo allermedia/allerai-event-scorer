@@ -49,6 +49,9 @@ class EventHandler:
 
             return jsonify({"status": "success"}), 202
 
+        except ValueError as e:
+            print(f"Bad request: {e}")
+            return jsonify({"error": str(e)}), 400
 
         except Exception as e:
             print(f"Error processing message: {e}")
