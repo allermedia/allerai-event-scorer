@@ -37,7 +37,7 @@ class EventHandler:
             df_articles = dfs["articles"]
             df_tag_scores = dfs["tag_scores"]
 
-            print("Scoring event...")
+            logger.info(f"Scoring article_id: {df_event['article_id'].iloc[0]}...")
 
             similarity_scores = self.similarity_scorer.embedding_relevance(df_event, df_articles)
             classification_scores = self.classification_scorer.category_relevance(df_event, df_articles)
@@ -52,6 +52,7 @@ class EventHandler:
                         
             self.pubsub_service.publish(payload, attributes)
 
+            logger.info(f"Published scores for article_id: {df_event['article_id'].iloc[0]}")
             return jsonify({"status": "success"}), 202      
         
         except Exception as e:   
