@@ -58,7 +58,7 @@ class EventHandler:
         except Exception as e:   
             logger.error(f"Error: {e}")         
             error_log = self.error_formatter(payload, message_id, e)            
-            self.pubsub_service_error_log.publish(error_log)
+            self.pubsub_service_error_log.publish(error_log, {})
             return jsonify({"error": str(e)}), 200
     
     def error_formatter(self, payload: Dict[str, Any], message_id: str, e: Exception) -> Dict[str, Any]:
