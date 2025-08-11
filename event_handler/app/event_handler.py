@@ -11,13 +11,14 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 class EventHandler:
-    def __init__(self, project_id: str, output_topic: str):
+    def __init__(self, project_id: str, output_topic: str, output_topic_error_log: str):
         self.pubsub_service = PubSubService(project_id, output_topic)
+        self.pubsub_service_error_log = PubSubService(project_id, output_topic_error_log)
 
     def process_request(self, request) -> Tuple[Optional[Any], Dict[str, Any]]:
 
         try:
-            payloads, attributes = self.parse_request(request)
+            payloads, attributes, message_id = self.parse_request(request)
 
             if payloads is None:
                 return jsonify({"status": "error", "reason": "Invalid JSON payload"}), 400
@@ -38,30 +39,47 @@ class EventHandler:
                     logger.exception(f"Failed to process payload with id {current_id}: {e}")
 
             return jsonify({"status": "success", "processed_count": len(payloads)}), 202
+    
+        except ValueError as e:
+            print(f"Bad request {message_id}: {e}")
+            try:
+                article_id = payload.get("article_id")
+                if article_id is None:
+                    raise KeyError("article_id not found in payload")
+            except (AttributeError, KeyError):
+                article_id = None
+
+            error_log = {
+                "message_id": message_id,
+                "article_id": article_id,
+                "error": str(e)
+            }
+            
+            self.pubsub_service_error_log.publish(error_log, {})
+            return jsonify({"error": str(e)}), 200
         
         except Exception as e:
             return jsonify({"error": str(e)}), 500
         
-    def parse_request(self,request) -> dict:
+    def parse_request(self, request) -> tuple:
         envelope = request.get_json()
-
         if not envelope or "message" not in envelope:
-            abort(400, "No Pub/Sub message received")
+            raise ValueError("No Pub/Sub message received")
 
         message = envelope["message"]
         data = message.get("data")
         if not data:
-            abort(400, "No data in Pub/Sub message")
+            raise ValueError("No data in Pub/Sub message")
 
         try:
             payload = json.loads(base64.b64decode(data).decode("utf-8"))
         except json.JSONDecodeError as e:
-            print(f"JSON decoding error: {e}")
-            return None, None
-        
-        attributes = message.get("attributes", {})
+            raise ValueError(f"JSON decoding error: {e}")
 
-        return payload, attributes
+        attributes = message.get("attributes", {})
+        message_id = message.get("messageId") 
+
+        return payload, attributes, message_id
         
     def validate_payload(self, payload: Dict[str, Any]) -> None:
         required_fields = ["id", "published", "site", "teaser", "title", "body"]

@@ -23,7 +23,9 @@ class RequestParser:
             raise ValueError(f"JSON decoding error: {e}")
 
         attributes = message.get("attributes", {})
-        return payload, attributes
+        message_id = message.get("messageId") 
+
+        return payload, attributes, message_id
 
     def payload_to_df(self, payload: dict) -> pd.DataFrame:
         if not isinstance(payload, dict):
