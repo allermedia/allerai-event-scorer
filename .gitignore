@@ -24,3 +24,6 @@ tfplan
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Local
+testing
