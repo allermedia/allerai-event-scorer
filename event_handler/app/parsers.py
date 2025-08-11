@@ -24,7 +24,7 @@ class RequestParser:
             raise ValueError(f"JSON decoding error: {e}")
 
         attributes = message.get("attributes", {})
-        message_id = message.get("messageId") 
+        message_id = message.get("messageId") or None
 
         return payload, attributes, message_id
         

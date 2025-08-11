@@ -16,52 +16,39 @@ class EventHandler:
     def process_request(self, request) -> Tuple[Optional[Any], Dict[str, Any]]:
         payload = None
         message_id = None
-        
+
         try:
             payloads, attributes, message_id = self.request_parser.parse_request(request)
 
-            if payloads is None:
-                return jsonify({"status": "error", "reason": "Invalid JSON payload"}), 400
-            
             if isinstance(payloads, dict):
                 payloads = [payloads]
             elif not isinstance(payloads, list):
-                return jsonify({"status": "error", "reason": "Payload must be JSON object or list"}), 400
+                return jsonify({"status": "error", "reason": "Payload must be dict or list"}), 400
 
-            for i, payload in enumerate(payloads):                
+            for i, payload in enumerate(payloads):
                 current_id = payload.get("id", f"index_{i}")
                 logger.info(f"Processing payload with id: {current_id}")
                 self.request_parser.validate_payload(payload)
                 self.pubsub_service.publish(payload)
                 logger.info(f"Published payload with id: {current_id}")
-
+            
             return jsonify({"status": "success", "processed_count": len(payloads)}), 202
-    
-        except ValueError as e:
-            logger.error(f"ValueError: {e}")
-            error_log = self.error_formatter(payload, message_id, e)            
+
+        except Exception as e:
+            error_log = self.error_formatter(payload, message_id, e)
             self.pubsub_service_error_log.publish(error_log)
             return jsonify({"error": str(e)}), 200
-        
-        except Exception as e:            
-            logger.error(f"Error: {e}")
-            error_log = self.error_formatter(payload, message_id, e)            
-            self.pubsub_service_error_log.publish(error_log)
-            return jsonify({"error": str(e)}), 200
+
     
     def error_formatter(self, payload: Dict[str, Any], message_id: str, e: Exception) -> Dict[str, Any]:
         try:
-            article_id = payload.get("article_id")
-            if article_id is None:
-                raise KeyError("article_id not found in payload")
+            article_id = payload.get("article_id") if payload else None
         except (AttributeError, KeyError):
             article_id = None
 
         error_log = {
-            "message_id": message_id,
+            "message_id": message_id or None,
             "article_id": article_id,
             "error": str(e)
         }
-
         return error_log
-    
