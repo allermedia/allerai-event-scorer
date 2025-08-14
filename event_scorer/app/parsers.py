@@ -25,7 +25,12 @@ class RequestParser:
         except json.JSONDecodeError as e:
             raise ValueError(f"JSON decoding error: {e}")
 
-        return payload, attributes, message_id
+        embedding_data = payload.get("embedding", {})
+        classification_data = payload.get("classification", {})
+
+        flattened_payload = {**embedding_data, **classification_data}
+
+        return flattened_payload, attributes, message_id
 
     def payload_to_df(self, payload: dict) -> pd.DataFrame:
         if not isinstance(payload, dict):

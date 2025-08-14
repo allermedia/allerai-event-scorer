@@ -24,13 +24,14 @@ class EventHandler:
     def process_request(self, request):
         payload = None
         message_id = None
+        attributes = {}
 
         try:
             payload, attributes, message_id = self.request_parser.parse_request(request)
 
             if payload is None:
                 return jsonify({"status": "error", "reason": "Invalid JSON payload"}), 400
-            
+        
             df_event = self.request_parser.payload_to_df(payload)
 
             dfs = self.data_manager.get_dataframes()
@@ -58,7 +59,7 @@ class EventHandler:
         except Exception as e:   
             logger.error(f"Error: {e}")         
             error_log = self.error_formatter(payload, message_id, e)            
-            self.pubsub_service_error_log.publish(error_log, {})
+            self.pubsub_service_error_log.publish(error_log, attributes)
             return jsonify({"error": str(e)}), 200
     
     def error_formatter(self, payload: Dict[str, Any], message_id: str, e: Exception) -> Dict[str, Any]:
