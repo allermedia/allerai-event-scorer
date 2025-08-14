@@ -23,7 +23,7 @@ class EventHandler:
             if isinstance(payloads, dict):
                 payloads = [payloads]
             elif not isinstance(payloads, list):
-                return jsonify({"status": "error", "reason": "Payload must be dict or list"}), 400
+                 raise ValueError("Payload must be dict or list")
 
             for i, payload in enumerate(payloads):
                 current_id = payload.get("id", f"index_{i}")
