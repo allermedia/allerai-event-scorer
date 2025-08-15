@@ -25,8 +25,9 @@ class RequestParser:
         except json.JSONDecodeError as e:
             raise ValueError(f"JSON decoding error: {e}")
 
-        embedding_data = payload.get("embedding", {})
-        classification_data = payload.get("classification", {})
+        data_block = payload.get("data", {})
+        embedding_data = data_block.get("embedding", {})
+        classification_data = data_block.get("classification", {})
 
         flattened_payload = {**embedding_data, **classification_data}
 
