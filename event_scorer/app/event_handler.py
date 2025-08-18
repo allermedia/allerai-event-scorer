@@ -59,10 +59,12 @@ class EventHandler:
             scores = self.scorer.compute_weighted_score(combined_scores)
             scores_na = scores.fillna(0) 
 
-            logger.info("\n%s", scores_na.to_string(max_rows=10, max_cols=5))
+            logger.info("\n%s", scores.to_string())
 
-            payload = scores.fillna(value=None).to_dict(orient="records")
-                        
+            payload = scores_na.to_dict(orient="records")
+
+            logger.info("Payload sample: %s", payload[:2])
+
             self.pubsub_service.publish(payload, attributes)
 
             logger.info(f"Published scores for article_id: {df_event['article_id'].iloc[0]}")
