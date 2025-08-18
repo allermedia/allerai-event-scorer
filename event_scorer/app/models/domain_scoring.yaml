@@ -15,19 +15,20 @@
 default:
   embedding_similarity: 0.6
   category_similarity: 0.2
+  tag_score: 0.2
 
 dagbladet.no:
   v1:
     embedding_similarity: 0.5
-    category_similarity: 0.3
-  v2:
-    embedding_similarity: 0.4
-    category_similarity: 0.4
+    category_similarity: 0.2
+    tag_score: 0.3
 
 billedbladet.dk:
   v1:
     embedding_similarity: 0.5
     category_similarity: 0.3
+    tag_score: 0.2
   v2:
-    embedding_similarity: 0.4
-    category_similarity: 0.4
+    embedding_similarity: 0.6
+    category_similarity: 0.1
+    tag_score: 0.3
