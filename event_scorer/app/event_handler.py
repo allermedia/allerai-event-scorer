@@ -1,8 +1,10 @@
 from flask import jsonify
 import sys
 sys.path.append('./models')
-from models.similarity import SimilarityScorer
-from models.classification import ClassificationScorer
+from features.similarity import SimilarityScorer
+from features.classification import ClassificationScorer
+from features.tags import TagScorer
+from scoring.scoring_weighted import Scorer
 from data_access import DataManager
 from parsers import RequestParser
 from pubsub import PubSubService
@@ -17,6 +19,8 @@ class EventHandler:
         self.data_manager = DataManager()
         self.similarity_scorer = SimilarityScorer()
         self.classification_scorer = ClassificationScorer()
+        self.tag_scorer = TagScorer()
+        self.scorer = Scorer()
         self.request_parser = RequestParser()
         self.pubsub_service = PubSubService(project_id, output_topic)
         self.pubsub_service_error_log = PubSubService(project_id, output_topic_error_log)
@@ -42,14 +46,17 @@ class EventHandler:
 
             similarity_scores = self.similarity_scorer.embedding_relevance(df_event, df_articles)
             classification_scores = self.classification_scorer.category_relevance(df_event, df_articles)
+            tag_scores = self.tag_scorer.tag_relevance(df_event, df_tag_scores)
 
-            combined_scores = similarity_scores.merge(
-                classification_scores,
-                on=["id", "site_domain"],
-                how="inner"
+            combined_scores = (
+                similarity_scores
+                .merge(classification_scores, on=["id", "site_domain"], how="inner")
+                .merge(tag_scores, on=["id", "site_domain"], how="left")
             )
 
-            payload = combined_scores.to_dict(orient="records")
+            scores = self.scorer.compute_weighted_score(combined_scores)
+                                                        
+            payload = scores.to_dict(orient="records")
                         
             self.pubsub_service.publish(payload, attributes)
 
