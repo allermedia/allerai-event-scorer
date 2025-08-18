@@ -1,6 +1,10 @@
 [
-  { "name": "tag", "type": "STRING", "mode": "REQUIRED" },
-  { "name": "score", "type": "FLOAT", "mode": "REQUIRED" },
   { "name": "site", "type": "STRING", "mode": "NULLABLE" },
-  { "name": "updated_at", "type": "TIMESTAMP", "mode": "REQUIRED" }
+  { "name": "tag", "type": "STRING", "mode": "REQUIRED" },
+  { "name": "score", "type": "INTEGER", "mode": "NULLABLE" },
+  { "name": "total_articles", "type": "INTEGER", "mode": "NULLABLE" },
+  { "name": "frequency", "type": "FLOAT", "mode": "NULLABLE" },
+  { "name": "max_frequency", "type": "FLOAT", "mode": "NULLABLE" },
+  { "name": "tag_score", "type": "FLOAT", "mode": "NULLABLE" },
+  { "name": "tag_type", "type": "STRING", "mode": "REQUIRED" }
 ]
