@@ -11,7 +11,7 @@ class TagScorer:
         df_entities = df_entities.copy()
         df_entities["tag"] = df_entities["tag"].astype(str).str.lower()
         bodytext = str(df_event.iloc[0]["bodytext"]).lower()
-        doc_id = df_event.iloc[0]["id"]
+        doc_id = df_event.iloc[0]["article_id"]
 
         for site, site_entities in df_entities.groupby("site"):
             site_entities = site_entities.assign(
