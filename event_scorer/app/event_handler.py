@@ -45,10 +45,13 @@ class EventHandler:
             logger.info(f"Scoring article_id: {df_event['article_id'].iloc[0]}...")
 
             similarity_scores = self.similarity_scorer.embedding_relevance(df_event, df_articles)
+            logger.info(f"{similarity_scores.shape[0]} similarity scores calculated.")
             logger.info("Calculating classification scores...")
             classification_scores = self.classification_scorer.category_relevance(df_event, df_articles)
+            logger.info(f"{classification_scores.shape[0]} classification scores calculated.")
             logger.info("Calculating tag relevance scores...")
             tag_scores = self.tag_scorer.tag_relevance(df_event, df_tag_scores)
+            logger.info(f"{tag_scores.shape[0]} tag scores calculated.")
 
             logger.info("Combining scores...")
 
@@ -57,10 +60,12 @@ class EventHandler:
                 .merge(classification_scores, on=["id", "site_domain"], how="inner")
                 .merge(tag_scores, on=["id", "site_domain"], how="left")
             )
+            logger.info(f"Combined scores shape: {combined_scores.shape}")
 
             logger.info("Computing weighted scores...")
 
             scores = self.scorer.compute_weighted_score(combined_scores)
+            logger.info(f"Computed weighted scores for {scores.shape[0]} articles.")
                                                         
             payload = combined_scores.to_dict(orient="records")
                         
