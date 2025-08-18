@@ -9,3 +9,4 @@ scikit-learn
 pandas
 numpy
 db-dtypes
+pyyaml
