@@ -54,9 +54,15 @@ class DataManager:
 
     def _fetch_tag_scores(self) -> pd.DataFrame:
         sql = f"""
-        SELECT * FROM `{self.project_id}.nordic_tag_scores.tag_scores`
+        SELECT 
+            site,
+            tag,
+            score as frequency,
+            total_articles,
+            max_frequency,
+            tag_type
+            FROM `{self.project_id}.nordic_tag_scores.tag_scores`
         WHERE TRUE
-        LIMIT 1
         """
         query_job = self.client.query(sql)
         df = query_job.result().to_dataframe()

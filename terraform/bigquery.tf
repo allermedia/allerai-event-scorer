@@ -41,5 +41,6 @@ resource "google_bigquery_table" "tables" {
    
   lifecycle {
     prevent_destroy = true
+    ignore_changes = [schema]
   }
 }

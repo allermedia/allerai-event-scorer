@@ -1,0 +1,33 @@
+# Scoring configuration
+# ----------------------
+# Define weights per feature for each domain.
+# Each key is a domain name, with a set of weights that sum up to ~1.0 (not enforced).
+# Features not listed default to 0.
+#
+# Example:
+#   domain.com:
+#     v1:
+#       embedding_similarity: 0.5
+#       categpry_similarity: 0.5
+#
+# The "default" section is used if no domain-specific config exists.
+
+default:
+  embedding_similarity: 0.6
+  category_similarity: 0.2
+
+dagbladet.no:
+  v1:
+    embedding_similarity: 0.5
+    category_similarity: 0.3
+  v2:
+    embedding_similarity: 0.4
+    category_similarity: 0.4
+
+billedbladet.dk:
+  v1:
+    embedding_similarity: 0.5
+    category_similarity: 0.3
+  v2:
+    embedding_similarity: 0.4
+    category_similarity: 0.4
