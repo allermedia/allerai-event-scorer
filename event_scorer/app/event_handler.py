@@ -62,18 +62,18 @@ class EventHandler:
 
             scores = self.scorer.compute_weighted_score(combined_scores)
                                                         
-            payload = scores.to_dict(orient="records")
+            payload = combined_scores.to_dict(orient="records")
                         
             self.pubsub_service.publish(payload, attributes)
 
             logger.info(f"Published scores for article_id: {df_event['article_id'].iloc[0]}")
-            return jsonify({"status": "success"}), 202      
+            return jsonify({"status": "success"}), 200      
         
         except Exception as e:   
             logger.error(f"Error: {e}")         
             error_log = self.error_formatter(payload, message_id, e)            
             self.pubsub_service_error_log.publish(error_log, attributes)
-            return jsonify({"error": str(e)}), 200
+            return jsonify({"error": str(e)}), 202
     
     def error_formatter(self, payload: Dict[str, Any], message_id: str, e: Exception) -> Dict[str, Any]:
         try:
