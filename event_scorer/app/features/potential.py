@@ -4,7 +4,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import ast
 
 class PotentialScorer:
-    
+
     def predict_classification(self, df_events, df_articles, N=25):
         df_articles = df_articles.dropna(subset=['pageviews_first_7_days'])
         
@@ -32,7 +32,6 @@ class PotentialScorer:
             all_predictions.append(predictions)
         
         return pd.concat(all_predictions, ignore_index=True)
-    
     
     def _classify_article(self, article_id, similar_articles, site_quartiles):
         results = []
