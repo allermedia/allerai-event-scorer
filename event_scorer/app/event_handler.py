@@ -68,6 +68,8 @@ class EventHandler:
 
             logger.info("\n%s", combined_scores.to_string(index=False))
 
+            logger.info(combined_scores[["embedding_similarity", "category_similarity", "tag_score"]].dtypes)
+
             scores = self.scorer.compute_weighted_score(combined_scores)
 
             final = scores.merge(

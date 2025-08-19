@@ -14,6 +14,7 @@ class Scorer:
         numeric_features = ["embedding_similarity", "category_similarity", "tag_score"]
         df[numeric_features] = df[numeric_features].apply(pd.to_numeric, errors='coerce').fillna(0.0)
 
+        print(self.config)
         results = []
 
         for _, row in df.iterrows():
