@@ -11,11 +11,8 @@ class PotentialScorer:
         site_quartiles = df_articles.groupby('site_domain')['pageviews_first_7_days'].quantile([0.25, 0.5, 0.75]).unstack()
         site_quartiles.columns = ['Q1', 'Q2', 'Q3']
         
-        for df in [df_articles, df_events]:
-            df['embeddings_en'] = df['embeddings_en'].apply(
-                lambda x: ast.literal_eval(x) if isinstance(x, str) else x
-            )
-        
+        df_articles = df_articles.dropna(subset=["embeddings_en"]).copy()
+
         article_embeddings = np.array(df_articles['embeddings_en'].tolist())
         
         all_predictions = []
