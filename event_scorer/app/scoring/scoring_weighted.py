@@ -16,21 +16,35 @@ class Scorer:
         for _, row in df.iterrows():
             domain_config = self.config.get(row["site_domain"], self.config["default"])
 
-            # if multiple versions exist, take the last one (latest)
             if isinstance(domain_config, dict) and any(isinstance(v, dict) for v in domain_config.values()):
                 latest_version = list(domain_config.keys())[-1]
                 weights = domain_config[latest_version]
             else:
                 weights = domain_config
 
-            weights = {k: v for k, v in weights.items() if k in row}
+            weighted_features = {}
+            additive_bonus = 0.0
 
-            # normalize weights
-            total_weight = sum(weights.values())
+            for feature, config in weights.items():
+                if isinstance(config, dict):
+                    f_type = config.get("type", "weighted")
+                    f_value = config.get("value", 0.0)
+                else:
+                    f_type = "weighted"
+                    f_value = config
+
+                if f_type == "weighted":
+                    weighted_features[feature] = f_value
+                elif f_type == "additive":
+                    additive_bonus += row.get(feature, 0.0) * f_value
+
+            total_weight = sum(weighted_features.values())
             if self.normalize and total_weight > 0:
-                weights = {k: v / total_weight for k, v in weights.items()}
+                weighted_features = {k: v / total_weight for k, v in weighted_features.items()}
 
-            score = sum(row.get(feature, 0.0) * weight for feature, weight in weights.items())
+            score = sum(row.get(f, 0.0) * w for f, w in weighted_features.items())
+
+            score = min(score + additive_bonus, 1.0)
 
             results.append({
                 "id": row["id"],
@@ -40,3 +54,4 @@ class Scorer:
             })
 
         return pd.DataFrame(results)
+    

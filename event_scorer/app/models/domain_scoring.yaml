@@ -1,34 +1,39 @@
-# Scoring configuration
-# ----------------------
 # Define weights per feature for each domain.
-# Each key is a domain name, with a set of weights that sum up to ~1.0 (not enforced).
+# Weighted features contribute proportionally to the final score (normalized).
+# Additive features are added on top as a bonus (not normalized).
 # Features not listed default to 0.
+# Versioning (v1, v2, ...) allows multiple configs per domain; the latest version is used.
 #
 # Example:
 #   domain.com:
 #     v1:
-#       embedding_similarity: 0.5
-#       categpry_similarity: 0.5
+#       embedding_similarity: 0.5               # weighted
+#       category_similarity: 0.3                # weighted
+#       tag_score:
+#         type: additive
+#         value: 0.5
 #
 # The "default" section is used if no domain-specific config exists.
 
 default:
-  embedding_similarity: 0.6
-  category_similarity: 0.2
-  tag_score: 0.2
+  embedding_similarity:
+    type: weighted
+    value: 0.6
+  category_similarity:
+    type: weighted
+    value: 0.3
+  tag_score:
+    type: additive
+    value: 0.5
 
 dagbladet.no:
   v1:
-    embedding_similarity: 0.5
-    category_similarity: 0.2
-    tag_score: 0.3
-
-billedbladet.dk:
-  v1:
-    embedding_similarity: 0.5
-    category_similarity: 0.3
-    tag_score: 0.2
-  v2:
-    embedding_similarity: 0.6
-    category_similarity: 0.1
-    tag_score: 0.3
+    embedding_similarity:
+      type: weighted
+      value: 0.7
+    category_similarity:
+      type: weighted
+      value: 0.3
+    tag_score:
+      type: additive
+      value: 0.5
