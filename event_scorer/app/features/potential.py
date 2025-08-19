@@ -28,7 +28,7 @@ class PotentialScorer:
                 .head(N)
             )
             
-            predictions = self._classify_article(event['id'], top_similar, site_quartiles)
+            predictions = self._classify_article(event['article_id'], top_similar, site_quartiles)
             all_predictions.append(predictions)
         
         return pd.concat(all_predictions, ignore_index=True)
