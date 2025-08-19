@@ -57,7 +57,7 @@ class DataManager:
         SELECT 
             site,
             tag,
-            score as frequency,
+            frequency,
             total_articles,
             max_frequency,
             tag_type
