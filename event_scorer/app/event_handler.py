@@ -42,15 +42,11 @@ class EventHandler:
             df_articles = dfs["articles"]
             df_tag_scores = dfs["tag_scores"]
 
-            logger.info(df_tag_scores.head())
-
             logger.info(f"Scoring article_id: {df_event['article_id'].iloc[0]}...")
 
             similarity_scores = self.similarity_scorer.embedding_relevance(df_event, df_articles)
             classification_scores = self.classification_scorer.category_relevance(df_event, df_articles)
             tag_scores = self.tag_scorer.tag_relevance(df_event, df_tag_scores)
-
-            logger.info(tag_scores.head())
 
             combined_scores = (
                 similarity_scores
@@ -58,9 +54,13 @@ class EventHandler:
                 .merge(tag_scores, on=["id", "site_domain"], how="left")
             )
 
+            logger.info("\n%s", combined_scores.to_string(index=False))
 
             scores = self.scorer.compute_weighted_score(combined_scores)
-            scores_na = scores.fillna(0) 
+            scores_na = scores.fillna(0)
+            scores_na["entities"] = scores_na["entities"].apply(
+                lambda x: x if isinstance(x, list) else []
+            )
 
             payload = scores_na.to_dict(orient="records")
 
