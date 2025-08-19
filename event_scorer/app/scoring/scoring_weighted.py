@@ -11,11 +11,15 @@ class Scorer:
         self.normalize = normalize
 
     def compute_weighted_score(self, df: pd.DataFrame) -> pd.DataFrame:
+        numeric_features = ["embedding_similarity", "category_similarity", "tag_score"]
+        df[numeric_features] = df[numeric_features].apply(pd.to_numeric, errors='coerce').fillna(0.0)
+
         results = []
 
         for _, row in df.iterrows():
             domain_config = self.config.get(row["site_domain"], self.config["default"])
 
+            # Handle YAML with versioning
             if isinstance(domain_config, dict) and any(isinstance(v, dict) for v in domain_config.values()):
                 latest_version = list(domain_config.keys())[-1]
                 weights = domain_config[latest_version]
@@ -49,8 +53,7 @@ class Scorer:
                 "id": row["id"],
                 "site_domain": row["site_domain"],
                 "score": score,
-                "entities": row["entities"]
+                "entities": row.get("entities", [])
             })
 
         return pd.DataFrame(results)
-    

@@ -65,9 +65,6 @@ class EventHandler:
                 .merge(tag_scores, on=["id", "site_domain"], how="left")
             )
             combined_scores["tag_score"] = combined_scores["tag_score"].fillna(0)
-            combined_scores["entities"] = combined_scores["entities"].apply(
-                lambda x: x if isinstance(x, list) else []
-            )
 
             logger.info("\n%s", combined_scores.to_string(index=False))
 
