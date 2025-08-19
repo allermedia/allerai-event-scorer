@@ -56,8 +56,10 @@ class EventHandler:
 
 
             scores = self.scorer.compute_weighted_score(combined_scores)
-            scores_na = scores.fillna(0) 
-
+            scores_na = scores.apply(
+                lambda col: col.fillna(0) if col.name != "entities" else col
+            )
+            
             payload = scores_na.to_dict(orient="records")
 
             self.pubsub_service.publish(payload, attributes)
