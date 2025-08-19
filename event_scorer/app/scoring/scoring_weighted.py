@@ -53,8 +53,9 @@ class Scorer:
             logger.info(f"DEBUG weighted_features: {weighted_features}")
             logger.info(f"DEBUG row values: { {f: row.get(f, 0.0) for f in weighted_features} }")
 
-            score = sum(float(row.get(f, 0.0)) * float(w) for f, w in weighted_features.items())
-            score = min(score + additive_bonus, 1.0)
+            #score = sum(float(row.get(f, 0.0)) * float(w) for f, w in weighted_features.items())
+
+            score = 0.0 #min(score + additive_bonus, 1.0)
 
             results.append({
                 "id": row["id"],
