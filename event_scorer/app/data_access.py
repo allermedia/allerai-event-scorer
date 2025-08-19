@@ -20,6 +20,7 @@ class DataManager:
 
         self._cached_articles: pd.DataFrame | None = None
         self._cached_tag_scores: pd.DataFrame | None = None
+        self._cached_traffic_data: pd.DataFrame | None = None
         self._last_refresh: float = 0
 
     def _fetch_articles(self) -> pd.DataFrame:
@@ -68,10 +69,33 @@ class DataManager:
         df = query_job.result().to_dataframe()
         return df
 
+    def _fetch_traffic_data(self) -> pd.DataFrame:
+        sql = f"""
+        SELECT
+            pv.page_id as article_id,
+            pv.site_domain,
+            SUM(pageview_count) AS pageviews_first_7_days
+        FROM `{self.project_id}.adp_pageviews.pages_pageviews` pv
+        JOIN (
+            SELECT page_id, published_ts
+            FROM `{self.project_id}.adp_pages.pages`
+        ) p
+        ON 
+            pv.page_id = p.page_id
+        WHERE 
+            DATE(pv.event_date) BETWEEN DATE(p.published_ts) AND DATE_ADD(DATE(p.published_ts), INTERVAL 6 DAY)
+        GROUP BY 
+            pv.page_id, pv.site_domain
+        """
+        query_job = self.client.query(sql)
+        df = query_job.result().to_dataframe()
+        return df
+
     def refresh_cache(self) -> None:
         try:
             self._cached_articles = self._fetch_articles()
             self._cached_tag_scores = self._fetch_tag_scores()
+            self._cached_traffic_data = self._fetch_traffic_data()
             self._last_refresh = time.time()
         except Exception:
             traceback.print_exc()
@@ -80,12 +104,13 @@ class DataManager:
     def get_dataframes(self) -> dict[str, pd.DataFrame | None]:
         try:
             now = time.time()
-            if (self._cached_articles is None or self._cached_tag_scores is None
+            if (self._cached_articles is None or self._cached_tag_scores is None or self._cached_traffic_data is None
                     or (now - self._last_refresh) > self.refresh_interval):
                 self.refresh_cache()
             return {
                 "articles": self._cached_articles.copy() if self._cached_articles is not None else None,
                 "tag_scores": self._cached_tag_scores.copy() if self._cached_tag_scores is not None else None,
+                "traffic": self._cached_traffic_data.copy() if self._cached_traffic_data is not None else None
             }
         except Exception:
             traceback.print_exc()
