@@ -48,7 +48,7 @@ class Scorer:
                 weighted_features = {k: v / total_weight for k, v in weighted_features.items()}
 
             score = sum(float(row.get(f, 0.0)) * float(w) for f, w in weighted_features.items())
-            score = min(score + additive_bonus, 1.0)
+            #score = min(score + additive_bonus, 1.0)
 
             results.append({
                 "id": row["id"],
