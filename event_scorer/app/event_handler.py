@@ -65,11 +65,7 @@ class EventHandler:
                 .merge(tag_scores, on=["id", "site_domain"], how="left")
             )
             combined_scores["tag_score"] = combined_scores["tag_score"].fillna(0)
-
-            logger.info("\n%s", combined_scores.to_string(index=False))
-
-            logger.info(combined_scores[["embedding_similarity", "category_similarity", "tag_score"]].dtypes)
-
+            
             scores = self.scorer.compute_weighted_score(combined_scores)
 
             final = scores.merge(
