@@ -136,8 +136,7 @@ class DataManager:
         secret_string = response.payload.data.decode("UTF-8")
         key_info = json.loads(secret_string)
         credentials = service_account.Credentials.from_service_account_info(key_info)
-        #source_project_id = key_info.get("project_id")
-        source_project_id = "aller-data-platform-dev-7ee5"
+        source_project_id = key_info.get("project_id")
         bq_client = bigquery.Client(credentials=credentials, project=source_project_id)
         
         return bq_client, source_project_id
