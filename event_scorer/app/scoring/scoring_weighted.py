@@ -14,7 +14,6 @@ class Scorer:
         numeric_features = ["embedding_similarity", "category_similarity", "tag_score"]
         df[numeric_features] = df[numeric_features].apply(pd.to_numeric, errors='coerce').fillna(0.0)
 
-        print(self.config)
         results = []
 
         for _, row in df.iterrows():
@@ -41,7 +40,7 @@ class Scorer:
                 if f_type == "weighted":
                     weighted_features[feature] = f_value
                 elif f_type == "additive":
-                    additive_bonus += 0.0 # float(row.get(feature, 0.0)) * float(f_value)
+                    additive_bonus += float(row.get(feature, 0.0)) * float(f_value)
 
             total_weight = sum(weighted_features.values())
             if self.normalize and total_weight > 0:
