@@ -35,7 +35,8 @@ class Scorer:
             results.append({
                 "id": row["id"],
                 "site_domain": row["site_domain"],
-                "score": score
+                "score": score,
+                "entities": row["entities"]
             })
 
         return pd.DataFrame(results)

@@ -54,16 +54,11 @@ class EventHandler:
                 .merge(tag_scores, on=["id", "site_domain"], how="left")
             )
 
-            logger.info("Computing weighted scores...")
 
             scores = self.scorer.compute_weighted_score(combined_scores)
             scores_na = scores.fillna(0) 
 
-            logger.info("\n%s", scores.to_string())
-
             payload = scores_na.to_dict(orient="records")
-
-            logger.info("Payload sample: %s", payload[:2])
 
             self.pubsub_service.publish(payload, attributes)
 
