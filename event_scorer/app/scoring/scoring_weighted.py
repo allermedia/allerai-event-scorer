@@ -26,7 +26,7 @@ class Scorer:
                 domain_config = self.config.get(row["site_domain"], self.config["default"])
 
                 # Handle YAML with versioning
-                if isinstance(domain_config, dict) and any(isinstance(v, dict) for v in domain_config.values()):
+                if all(k.startswith("v") for k in domain_config.keys()):
                     latest_version = list(domain_config.keys())[-1]
                     weights = domain_config[latest_version]
                 else:
@@ -44,11 +44,10 @@ class Scorer:
                         f_value = config
 
                     if f_type == "weighted":
-                        weighted_features[feature] = float(f_value)
+                        weighted_features[feature] = (f_value)
                     elif f_type == "additive":
-                        additive_bonus += float(row.get(feature, 0.0)) * float(f_value)
+                        additive_bonus += row.get(feature, 0.0) * f_value
 
-                
                 logger.info(f"DEBUG weighted_features: {weighted_features}")
                 logger.info(f"DEBUG row values: { {f: row.get(f, 0.0) for f in weighted_features} }")
 
@@ -56,8 +55,7 @@ class Scorer:
                 if self.normalize and total_weight > 0:
                     weighted_features = {k: v / total_weight for k, v in weighted_features.items()}
 
-                score = sum(float(row.get(f, 0.0)) * float(w) for f, w in weighted_features.items())
-
+                score = sum(row.get(f, 0.0) * w for f, w in weighted_features.items())
                 score = min(score + additive_bonus, 1.0)
 
                 results.append({

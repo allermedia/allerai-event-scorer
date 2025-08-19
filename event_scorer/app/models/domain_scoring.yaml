@@ -37,3 +37,13 @@ dagbladet.no:
     tag_score:
       type: additive
       value: 0.5
+  v2:
+    embedding_similarity:
+      type: weighted
+      value: 0.8
+    category_similarity:
+      type: weighted
+      value: 0.2
+    tag_score:
+      type: additive
+      value: 0.6
