@@ -4,6 +4,7 @@ sys.path.append('./models')
 from features.similarity import SimilarityScorer
 from features.classification import ClassificationScorer
 from features.tags import TagScorer
+from features.potential import PotentialScorer
 from scoring.scoring_weighted import Scorer
 from data_access import DataManager
 from parsers import RequestParser
@@ -20,6 +21,7 @@ class EventHandler:
         self.similarity_scorer = SimilarityScorer()
         self.classification_scorer = ClassificationScorer()
         self.tag_scorer = TagScorer()
+        self.potential_scorer = PotentialScorer()
         self.scorer = Scorer()
         self.request_parser = RequestParser()
         self.pubsub_service = PubSubService(project_id, output_topic)
@@ -41,6 +43,15 @@ class EventHandler:
             dfs = self.data_manager.get_dataframes()
             df_articles = dfs["articles"]
             df_tag_scores = dfs["tag_scores"]
+            df_traffic = dfs["traffic"]
+
+            df_articles = df_articles.merge(
+                df_traffic[['article_id', 'site_domain', 'pageviews_first_7_days']],
+                on=['article_id', 'site_domain'],
+                how='left'
+            )
+
+            potential_scores = self.potential_scorer.predict_classification(df_event, df_articles)
 
             logger.info(f"Scoring article_id: {df_event['article_id'].iloc[0]}...")
 
@@ -53,16 +64,22 @@ class EventHandler:
                 .merge(classification_scores, on=["id", "site_domain"], how="inner")
                 .merge(tag_scores, on=["id", "site_domain"], how="left")
             )
+            combined_scores["tag_score"] = combined_scores["tag_score"].fillna(0)
+            combined_scores["entities"] = combined_scores["entities"].apply(
+                lambda x: x if isinstance(x, list) else []
+            )
 
             logger.info("\n%s", combined_scores.to_string(index=False))
 
             scores = self.scorer.compute_weighted_score(combined_scores)
-            scores_na = scores.fillna(0)
-            scores_na["entities"] = scores_na["entities"].apply(
-                lambda x: x if isinstance(x, list) else []
+
+            final = scores.merge(
+                potential_scores[['id', 'site_domain', 'potential_quartile', 'pageview_range']],
+                on=['id', 'site_domain'],
+                how='left'
             )
 
-            payload = scores_na.to_dict(orient="records")
+            payload = final.to_dict(orient="records")
 
             self.pubsub_service.publish(payload, attributes)
 
@@ -87,3 +104,4 @@ class EventHandler:
             "error": str(e)
         }
         return error_log
+    
