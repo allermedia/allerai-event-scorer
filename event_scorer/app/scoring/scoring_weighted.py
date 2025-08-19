@@ -36,7 +36,7 @@ class Scorer:
                 if f_type == "weighted":
                     weighted_features[feature] = f_value
                 elif f_type == "additive":
-                    additive_bonus += row.get(feature, 0.0) * f_value
+                    additive_bonus += float(row.get(feature, 0.0)) * float(f_value)
 
             total_weight = sum(weighted_features.values())
             if self.normalize and total_weight > 0:
