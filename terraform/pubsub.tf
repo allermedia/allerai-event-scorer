@@ -8,6 +8,14 @@ resource "google_pubsub_topic" "topics" {
   name     = each.value.name
 }
 
+resource "google_pubsub_topic" "deadletters" {
+  for_each = {
+    for s in local.subscriptions : s.name => s
+    if contains(keys(s), "deadletter_topic")
+  }
+  name = each.value.deadletter_topic
+}
+
 resource "google_pubsub_subscription" "subscriptions" {
   for_each = { for s in local.subscriptions : s.name => s }
 
@@ -39,11 +47,43 @@ resource "google_pubsub_subscription" "subscriptions" {
     }
   }
 
-  ack_deadline_seconds = 10
+  ack_deadline_seconds = 60
 
   depends_on = [
     google_bigquery_dataset_iam_member.pubsub_bigquery_access,
     google_service_account_iam_member.allow_pubsub_to_impersonate_pubsub_sa,
     google_service_account_iam_member.allow_terraform_actas_pubsub_sa
+  ]
+  
+  dynamic "dead_letter_policy" {
+    for_each = contains(keys(each.value), "deadletter_topic") ? [1] : []
+    content {
+      dead_letter_topic     = google_pubsub_topic.deadletters[each.key].id
+      max_delivery_attempts = 5
+    }
+  }
+}
+
+resource "google_pubsub_subscription" "deadletter_bq_subscriptions" {
+  for_each = google_pubsub_topic.deadletters
+
+  name  = "${each.key}-bq-subscription"
+  topic = each.value.id
+
+  bigquery_config {
+    table = format(
+      "%s.%s.%s",
+      var.project_id,
+      "pubsub_events",
+      "${each.key}_dlt_messages"      
+    )
+    use_topic_schema = false
+    write_metadata   = true
+  }
+
+  ack_deadline_seconds = 60
+
+  depends_on = [
+    google_bigquery_dataset_iam_member.pubsub_bigquery_access
   ]
 }

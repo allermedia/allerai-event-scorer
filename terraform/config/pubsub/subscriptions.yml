@@ -9,6 +9,7 @@
 - name: allerai-scorer-events-bq-subscription
   topic: allerai-scorer-events
   bigquery_table: pubsub_events.input_events
+  deadletter_topic: allerai-scorer-events-dlt
 
 - name: allerai-scorer-events-error-log-bq-subscription
   topic: allerai-scorer-events-error-log
@@ -17,6 +18,7 @@
 - name: allerai-scorer-events-push-bq-subscription
   topic: allerai-scorer-events-push
   bigquery_table: pubsub_events.output_events
+  deadletter_topic: allerai-scorer-events-push-dlt
 
 - name: allerai-scorer-events-push-error-log-bq-subscription
   topic: allerai-scorer-events-push-error-log
