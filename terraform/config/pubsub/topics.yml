@@ -1,7 +1,5 @@
 - name: allerai-scorer-events
-- name: allerai-scorer-events-dlt
 - name: allerai-scorer-events-error-log
 - name: allerai-scorer-events-push
-- name: allerai-scorer-events-push-dlt
 - name: allerai-scorer-events-push-error-log
 - name: allerai-enrichment-push-test
