@@ -35,18 +35,14 @@ resource "google_service_account_iam_member" "allow_terraform_actas_pubsub_sa" {
   member             = "serviceAccount:aller-ai-sa@aller-content-tool.iam.gserviceaccount.com"
 }
 
-resource "google_pubsub_topic_iam_member" "dlt_publisher" {
-  for_each = google_pubsub_topic.deadletters
-
-  topic  = each.value.id
-  role   = "roles/pubsub.publisher"
-  member = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+resource "google_project_iam_member" "pubsub_subscriber" {
+  project = var.project_id
+  role    = "roles/pubsub.subscriber"
+  member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
 }
 
-resource "google_pubsub_topic_iam_member" "dlt_subscriber" {
-  for_each = google_pubsub_topic.deadletters
-
-  topic  = each.value.id
-  role   = "roles/pubsub.subscriber"
-  member = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+resource "google_project_iam_member" "pubsub_publisher" {
+  project = var.project_id
+  role    = "roles/pubsub.publisher"
+  member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
 }
