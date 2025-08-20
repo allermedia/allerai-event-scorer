@@ -9,6 +9,10 @@
       schema_file: config/schemas/pubsub.json
     - table_id: output_events_error_log
       schema_file: config/schemas/pubsub.json
+    - table_id: input_events_dlt
+      schema_file: config/schemas/pubsub.json
+    - table_id: output_events_dlt
+      schema_file: config/schemas/pubsub.json
 
 - dataset_id: nordic_tag_scores
   location: EU

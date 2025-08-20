@@ -65,17 +65,19 @@ resource "google_pubsub_subscription" "subscriptions" {
 }
 
 resource "google_pubsub_subscription" "deadletter_bq_subscriptions" {
-  for_each = google_pubsub_topic.deadletters
+  for_each = {
+    for s in local.subscriptions : s.name => s
+    if contains(keys(s), "deadletter_topic") && contains(keys(s), "deadletter_table")
+  }
 
   name  = "${each.key}-bq-subscription"
-  topic = each.value.id
+  topic = google_pubsub_topic.deadletters[each.key].id
 
   bigquery_config {
     table = format(
-      "%s.%s.%s",
-      var.project_id,
-      "pubsub_events",
-      "${each.key}_dlt_messages"      
+      "%s.%s",
+      split(".", each.value.deadletter_table)[0],
+      split(".", each.value.deadletter_table)[1]   
     )
     use_topic_schema = false
     write_metadata   = true
