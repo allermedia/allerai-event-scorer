@@ -1,13 +1,18 @@
 data "google_project" "project" {}
 
-resource "google_bigquery_dataset_iam_member" "pubsub_bigquery_access" {
-  for_each = {
-    for s in local.subscriptions :
-    s.name => s
-    if contains(keys(s), "bigquery_table")
-  }
+locals {
+  pubsub_bq_datasets = distinct(flatten([
+    for s in local.subscriptions : compact([
+      try(split(".", s.bigquery_table)[0], null),
+      try(split(".", s.deadletter_table)[0], null)
+    ])
+  ]))
+}
 
-  dataset_id = split(".", each.value.bigquery_table)[0]
+resource "google_bigquery_dataset_iam_member" "pubsub_bigquery_access" {
+  for_each = toset(local.pubsub_bq_datasets)
+
+  dataset_id = each.value
   role       = "roles/bigquery.dataEditor"
   member     = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
 
