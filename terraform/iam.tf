@@ -40,7 +40,7 @@ resource "google_pubsub_topic_iam_member" "dlt_publisher" {
 
   topic  = each.value.id
   role   = "roles/pubsub.publisher"
-  member = "serviceAccount:aller-ai-pubsub-sa@aller-content-tool.iam.gserviceaccount.com"
+  member = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
 }
 
 resource "google_pubsub_topic_iam_member" "dlt_subscriber" {
@@ -48,5 +48,5 @@ resource "google_pubsub_topic_iam_member" "dlt_subscriber" {
 
   topic  = each.value.id
   role   = "roles/pubsub.subscriber"
-  member = "serviceAccount:aller-ai-pubsub-sa@aller-content-tool.iam.gserviceaccount.com"
+  member = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
 }
