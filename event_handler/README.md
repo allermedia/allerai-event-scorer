@@ -1,8 +1,17 @@
-# Event Handler Flask Service
+## Event Handler
 
 This Flask-based service processes incoming Pub/Sub messages containing JSON payloads, validates the payloads, and republishes each valid payload to another Pub/Sub topic. It logs processing status for each payload.
 
 ---
+
+### 1. Overview
+
+- **Pub/Sub** receives incoming events from authorized sources.
+- **Event Handler Cloud Run service**:
+  - Parses incoming events.
+  - Performs sanity checks and data validation.
+  - Ensures required fields are present.
+- Valid events are forwarded to the **Aller Data Platform (ADP)**.
 
 ## Features
 
@@ -21,22 +30,3 @@ This service requires two environment variables to be set:
 - `OUTPUT_TOPIC`: The name of the Pub/Sub topic to publish messages to.
 
 ---
-
-## Setup
-
-### Prerequisites
-
-- Python 3.8+
-- Google Cloud SDK installed and configured
-- Pub/Sub topics created in your GCP project
-- `pubsub.py` module with `PubSubService` client (must be implemented separately)
-
-### Installation
-
-1. Clone the repo
-
-2. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```

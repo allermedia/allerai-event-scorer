@@ -65,7 +65,7 @@ class EventHandler:
                 .merge(tag_scores, on=["id", "site_domain"], how="left")
             )
             combined_scores["tag_score"] = combined_scores["tag_score"].fillna(0)
-            
+
             scores = self.scorer.compute_weighted_score(combined_scores)
 
             final = scores.merge(
@@ -75,7 +75,6 @@ class EventHandler:
             )
 
             payload = final.to_dict(orient="records")
-
             self.pubsub_service.publish(payload, attributes)
 
             logger.info(f"Published scores for article_id: {df_event['article_id'].iloc[0]}")

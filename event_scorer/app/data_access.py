@@ -46,7 +46,7 @@ class DataManager:
             sub_category, 
             embeddings_en
         FROM ranked_articles
-        WHERE rn <= 50
+        WHERE rn <= 1000
         """
         query_job = self.client_articles.query(sql)
         df = query_job.result().to_dataframe()

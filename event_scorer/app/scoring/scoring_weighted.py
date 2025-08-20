@@ -48,9 +48,6 @@ class Scorer:
                     elif f_type == "additive":
                         additive_bonus += row.get(feature, 0.0) * f_value
 
-                logger.info(f"DEBUG weighted_features: {weighted_features}")
-                logger.info(f"DEBUG row values: { {f: row.get(f, 0.0) for f in weighted_features} }")
-
                 total_weight = sum(weighted_features.values())
                 if self.normalize and total_weight > 0:
                     weighted_features = {k: v / total_weight for k, v in weighted_features.items()}
