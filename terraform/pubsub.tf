@@ -64,29 +64,17 @@ resource "google_pubsub_subscription" "subscriptions" {
   }
 }
 
-resource "google_pubsub_subscription" "deadletter_bq_subscriptions" {
+resource "google_pubsub_subscription" "dlt_pull_debug" {
   for_each = {
-    for s in local.subscriptions : s.name => s
-    if contains(keys(s), "deadletter_topic") && contains(keys(s), "deadletter_table")
+    for s in local.subscriptions :
+    s.name => s
+    if contains(keys(s), "deadletter_topic")
   }
 
-  name  = "${each.key}-dlt-bq-sub"
-  topic = google_pubsub_topic.deadletters[each.key].id
+  name  = "${each.value.deadletter_topic}-pull-debug"
+  topic = google_pubsub_topic.deadletters[each.key].name
 
-  bigquery_config {
-    table = format(
-        "%s.%s.%s",
-        var.project_id,
-        split(".", each.value.deadletter_table)[0],
-        google_bigquery_table.tables[each.value.deadletter_table].table_id
-      )
-    use_topic_schema = false
-    write_metadata   = true
-  }
+  ack_deadline_seconds = 20
 
-  ack_deadline_seconds = 60
-
-  depends_on = [
-    google_bigquery_dataset_iam_member.pubsub_bigquery_access
-  ]
+  message_retention_duration = "259200s"
 }
