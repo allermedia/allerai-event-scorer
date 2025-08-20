@@ -70,7 +70,7 @@ resource "google_pubsub_subscription" "deadletter_bq_subscriptions" {
     if contains(keys(s), "deadletter_topic") && contains(keys(s), "deadletter_table")
   }
 
-  name  = "${each.key}-bq-subscription"
+  name  = "${each.key}-dlt-bq-sub"
   topic = google_pubsub_topic.deadletters[each.key].id
 
   bigquery_config {
