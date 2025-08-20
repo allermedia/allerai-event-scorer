@@ -75,10 +75,11 @@ resource "google_pubsub_subscription" "deadletter_bq_subscriptions" {
 
   bigquery_config {
     table = format(
-      "%s.%s",
-      split(".", each.value.deadletter_table)[0],
-      split(".", each.value.deadletter_table)[1]   
-    )
+        "%s.%s.%s",
+        var.project_id,
+        split(".", each.value.deadletter_table)[0],
+        google_bigquery_table.tables[each.value.deadletter_table].table_id
+      )
     use_topic_schema = false
     write_metadata   = true
   }
