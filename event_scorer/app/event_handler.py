@@ -10,10 +10,13 @@ from data_access import DataManager
 from parsers import RequestParser
 from pubsub import PubSubService
 from typing import Any, Dict
+from concurrent.futures import ThreadPoolExecutor
 import logging
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
+
+executor = ThreadPoolExecutor(max_workers=5)
 
 class EventHandler:
     def __init__(self, project_id: str, output_topic: str, output_topic_error_log: str):
@@ -28,16 +31,26 @@ class EventHandler:
         self.pubsub_service_error_log = PubSubService(project_id, output_topic_error_log)
 
     def process_request(self, request):
-        payload = None
-        message_id = None
-        attributes = {}
-
         try:
             payload, attributes, message_id = self.request_parser.parse_request(request)
 
             if payload is None:
                 return jsonify({"status": "error", "reason": "Invalid JSON payload"}), 400
+
+            future = executor.submit(
+                self.event_handler, payload, attributes, message_id
+            )
+
+            future.add_done_callback(self._task_done_callback)
+
+            return jsonify({"status": "success"}), 202
+
+        except Exception as e:
+            logger.error(f"Error in request parsing: {e}")
+            return jsonify({"error": str(e)}), 400
         
+    def event_handler(self, payload, attributes, message_id):
+        try:
             df_event = self.request_parser.payload_to_df(payload)
 
             dfs = self.data_manager.get_dataframes()
@@ -52,7 +65,6 @@ class EventHandler:
             )
 
             potential_scores = self.potential_scorer.predict_classification(df_event, df_articles)
-
             logger.info(f"Scoring article_id: {df_event['article_id'].iloc[0]}...")
 
             similarity_scores = self.similarity_scorer.embedding_relevance(df_event, df_articles)
@@ -74,17 +86,14 @@ class EventHandler:
                 how='left'
             )
 
-            payload = final.to_dict(orient="records")
-            self.pubsub_service.publish(payload, attributes)
-
+            payload_to_publish = final.to_dict(orient="records")
+            self.pubsub_service.publish(payload_to_publish, attributes)
             logger.info(f"Published scores for article_id: {df_event['article_id'].iloc[0]}")
-            return jsonify({"status": "success"}), 200      
-        
-        except Exception as e:   
-            logger.error(f"Error: {e}")         
-            error_log = self.error_formatter(payload, message_id, e)            
+
+        except Exception as e:
+            logger.error(f"Background error: {e}")
+            error_log = self.error_formatter(payload, message_id, e)
             self.pubsub_service_error_log.publish(error_log, attributes)
-            return jsonify({"error": str(e)}), 202
     
     def error_formatter(self, payload: Dict[str, Any], message_id: str, e: Exception) -> Dict[str, Any]:
         try:
@@ -99,3 +108,9 @@ class EventHandler:
         }
         return error_log
     
+    def _task_done_callback(self, future):
+        exception = future.exception()
+        if exception:
+            logger.error(f"Background task failed: {exception}")
+        else:
+            logger.info("Background task completed successfully")
