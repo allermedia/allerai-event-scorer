@@ -32,12 +32,12 @@ class EventHandler:
                 self.pubsub_service.publish(payload)
                 logger.info(f"Published payload for enrichment with id: {current_id}")
             
-            return jsonify({"status": "success", "processed_count": len(payloads)}), 202
+            return jsonify({"status": "success", "processed_count": len(payloads)}), 200
 
         except Exception as e:
             error_log = self.error_formatter(payloads, message_id, e)
             self.pubsub_service_error_log.publish(error_log)
-            return jsonify({"error": str(e)}), 200
+            return jsonify({"error": str(e)}), 202
 
     
     def error_formatter(self, payload: Dict[str, Any], message_id: str, e: Exception) -> Dict[str, Any]:
