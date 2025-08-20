@@ -17,6 +17,7 @@ class Scorer:
 
     def compute_weighted_score(self, df: pd.DataFrame) -> pd.DataFrame:
         try:
+            df["entities"] = df["entities"].apply(lambda x: [] if pd.isna(x) else x)
             numeric_features = ["embedding_similarity", "category_similarity", "tag_score"]
             df[numeric_features] = df[numeric_features].apply(pd.to_numeric, errors='coerce').fillna(0.0)
 
