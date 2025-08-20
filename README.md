@@ -6,7 +6,10 @@ This repository contains the **Event Scoring Integration**, a two-part pipeline 
 
 ## 🚀 Overview
 
-The integration consists of **two connected services**:
+This integration can be visualized in below chart:
+![Event Scorer](event_scorer_flow.png)
+
+The integration mainly consists of **two connected services**:
 
 ### 1. Event Handler
 
@@ -90,7 +93,7 @@ Required fields in the payload are:
 ["id", "published", "site", "teaser", "title", "body"]
 ```
 
-The payload must be a flat JSON object with these values.
+The payload can be a flat JSON object or a list of objects with these values.
 
 ```json
 {

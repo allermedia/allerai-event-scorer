@@ -8,6 +8,14 @@ resource "google_pubsub_topic" "topics" {
   name     = each.value.name
 }
 
+resource "google_pubsub_topic" "deadletters" {
+  for_each = {
+    for s in local.subscriptions : s.name => s
+    if contains(keys(s), "deadletter_topic")
+  }
+  name = each.value.deadletter_topic
+}
+
 resource "google_pubsub_subscription" "subscriptions" {
   for_each = { for s in local.subscriptions : s.name => s }
 
