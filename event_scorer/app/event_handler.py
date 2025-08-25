@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 class EventHandler:
-    def __init__(self, project_id: str, output_topic: str, output_topic_error_log: str):
-        self.data_manager = DataManager()
+    def __init__(self, project_id: str, output_topic: str, output_topic_error_log: str, adp_project_id: str):
+        self.data_manager = DataManager(adp_project_id)
         self.similarity_scorer = SimilarityScorer()
         self.classification_scorer = ClassificationScorer()
         self.tag_scorer = TagScorer()
