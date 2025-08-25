@@ -6,11 +6,11 @@ import traceback
 import numpy as np
 
 class DataManager:
-    def __init__(self, refresh_interval_seconds: int = 3600):
+    def __init__(self, adp_project_id, refresh_interval_seconds: int = 3600):
         self.refresh_interval = refresh_interval_seconds
-        
         credentials, self.project_id = google.auth.default()
         self.client = bigquery.Client()
+        self.adp_project_id = adp_project_id
         self._cached_articles: pd.DataFrame | None = None
         self._cached_tag_scores: pd.DataFrame | None = None
         self._cached_traffic_data: pd.DataFrame | None = None
@@ -27,7 +27,7 @@ class DataManager:
                 sub_category,
                 text_embeddings_en as embeddings_en,
                 ROW_NUMBER() OVER (PARTITION BY site_domain ORDER BY published_ts DESC) AS rn
-            FROM `aller-data-platform-dev-7ee5.editorial.pages`
+            FROM `{self.adp_project_id}.editorial.pages`
             WHERE page_type = 'Article'
             AND text_embeddings_en IS NOT NULL
         )
