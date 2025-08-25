@@ -1,14 +1,9 @@
 import time
 import pandas as pd
 from google.cloud import bigquery
-import json
-from google.cloud import secretmanager
-from google.oauth2 import service_account
-import os
 import google.auth
 import traceback
 import numpy as np
-
 
 class DataManager:
     def __init__(self, refresh_interval_seconds: int = 3600):
@@ -16,8 +11,6 @@ class DataManager:
         
         credentials, self.project_id = google.auth.default()
         self.client = bigquery.Client()
-        self.client_articles, self.articles_project_id = self.get_source_client(self.project_id)
-
         self._cached_articles: pd.DataFrame | None = None
         self._cached_tag_scores: pd.DataFrame | None = None
         self._cached_traffic_data: pd.DataFrame | None = None
@@ -34,7 +27,7 @@ class DataManager:
                 sub_category,
                 text_embeddings_en as embeddings_en,
                 ROW_NUMBER() OVER (PARTITION BY site_domain ORDER BY published_ts DESC) AS rn
-            FROM `{self.articles_project_id}.editorial.pages`
+            FROM `aller-data-platform-dev-7ee5.editorial.pages`
             WHERE page_type = 'Article'
             AND text_embeddings_en IS NOT NULL
         )
@@ -48,7 +41,7 @@ class DataManager:
         FROM ranked_articles
         WHERE rn <= 1000
         """
-        query_job = self.client_articles.query(sql)
+        query_job = self.client.query(sql)
         df = query_job.result().to_dataframe()
         df = self.validate_embeddings_column(df)
         return df
@@ -124,19 +117,3 @@ class DataManager:
 
         df["embeddings_en"] = df["embeddings_en"].apply(safe_pass)
         return df
-
-    def get_source_client(self, secret_project_id: str):
-        secret_name = os.getenv("ADP_SECRET_NAME")
-        if not secret_name:
-            raise ValueError("Environment variable 'ADP_SECRET_NAME' is not set.")
-        
-        client = secretmanager.SecretManagerServiceClient()
-        secret_path = f"projects/{secret_project_id}/secrets/{secret_name}/versions/latest"
-        response = client.access_secret_version(request={"name": secret_path})
-        secret_string = response.payload.data.decode("UTF-8")
-        key_info = json.loads(secret_string)
-        credentials = service_account.Credentials.from_service_account_info(key_info)
-        source_project_id = key_info.get("project_id")
-        bq_client = bigquery.Client(credentials=credentials, project=source_project_id)
-        
-        return bq_client, source_project_id

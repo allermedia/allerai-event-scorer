@@ -43,8 +43,7 @@ jobs:
         run: |
           ENV_VARS="{
             TARGET_PROJECT_ID = \"${{ secrets.ADP_PROJECT_ID }}\",
-            OUTPUT_TOPIC = \"${{ secrets.ADP_ENRICHMENT_TOPIC }}\",
-            ADP_SECRET_NAME = \"${{ secrets.ADP_SA_SECRET_NAME }}\"
+            OUTPUT_TOPIC = \"${{ secrets.ADP_ENRICHMENT_TOPIC }}\"
           }"
           terraform apply -auto-approve -var="env_vars=${ENV_VARS}"
         working-directory: terraform
