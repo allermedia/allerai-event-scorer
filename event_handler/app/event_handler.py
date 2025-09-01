@@ -40,10 +40,10 @@ class EventHandler:
             return jsonify({"status": "success", "processed_count": len(payloads)}), 200
 
         except Exception as e:
+            logger.exception("Error processing request")  # <-- logs stack trace
             error_log = self.error_formatter(payloads, message_id, e)
             self.pubsub_service_error_log.publish(error_log)
             return jsonify({"error": str(e)}), 202
-
     
     def error_formatter(self, payload: Dict[str, Any], message_id: str, e: Exception) -> Dict[str, Any]:
         try:
