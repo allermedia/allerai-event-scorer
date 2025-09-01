@@ -2,6 +2,7 @@ from flask import jsonify
 from pubsub import PubSubService
 from parsers import RequestParser
 from typing import Any, Dict, Optional, Tuple
+from bs4 import BeautifulSoup
 import logging
 
 logger = logging.getLogger(__name__)
@@ -10,6 +11,7 @@ logging.basicConfig(level=logging.INFO)
 class EventHandler:
     def __init__(self, project_id: str, output_topic: str, output_topic_error_log: str):
         self.request_parser = RequestParser()
+        self.html_parser = BeautifulSoup()
         self.pubsub_service = PubSubService(project_id, output_topic)
         self.pubsub_service_error_log = PubSubService(project_id, output_topic_error_log)
 
@@ -29,6 +31,10 @@ class EventHandler:
                 current_id = payload.get("id", f"index_{i}")
                 logger.info(f"Processing payload with id: {current_id}")
                 self.request_parser.validate_payload(payload)
+                
+                for html_field in ["title", "teaser", "body"]:
+                    payload[html_field] = self._sanitize_html(payload[html_field])
+
                 self.pubsub_service.publish(payload)
                 logger.info(f"Published payload for enrichment with id: {current_id}")
             
@@ -52,3 +58,9 @@ class EventHandler:
             "error": str(e)
         }
         return error_log
+    
+    def _sanitize_html(self, html_content: str) -> str:
+        soup = self.html_parser(html_content, "html.parser")
+        lines = [line.strip() for line in soup.get_text(separator="\n").splitlines()]
+        clean_text = "\n".join(line for line in lines if line)
+        return clean_text
