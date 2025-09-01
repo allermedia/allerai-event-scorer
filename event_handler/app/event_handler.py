@@ -11,7 +11,6 @@ logging.basicConfig(level=logging.INFO)
 class EventHandler:
     def __init__(self, project_id: str, output_topic: str, output_topic_error_log: str):
         self.request_parser = RequestParser()
-        self.html_parser = BeautifulSoup()
         self.pubsub_service = PubSubService(project_id, output_topic)
         self.pubsub_service_error_log = PubSubService(project_id, output_topic_error_log)
 
@@ -60,7 +59,7 @@ class EventHandler:
         return error_log
     
     def _sanitize_html(self, html_content: str) -> str:
-        soup = self.html_parser(html_content, "html.parser")
+        soup = BeautifulSoup(html_content, "html.parser")
         lines = [line.strip() for line in soup.get_text(separator="\n").splitlines()]
         clean_text = "\n".join(line for line in lines if line)
         return clean_text
