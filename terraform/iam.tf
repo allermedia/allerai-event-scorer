@@ -46,3 +46,12 @@ resource "google_project_iam_member" "pubsub_publisher" {
   role    = "roles/pubsub.publisher"
   member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
 }
+
+resource "google_cloud_run_service_iam_member" "adp_cloudrun_invoker" {
+  project  = var.project_id
+  location = var.region
+  service  = "allerai-scorer"
+
+  role   = "roles/run.invoker"
+  member = "serviceAccount:aller-data-processor@aller-data-platform-prod-1f89.iam.gserviceaccount.com"
+}
