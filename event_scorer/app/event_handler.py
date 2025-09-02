@@ -10,6 +10,7 @@ from data_access import DataManager
 from parsers import RequestParser
 from pubsub import PubSubService
 from typing import Any, Dict
+import pandas as pd
 import logging
 
 logger = logging.getLogger(__name__)
@@ -65,6 +66,8 @@ class EventHandler:
                 .merge(tag_scores, on=["id", "site_domain"], how="left")
             )
             combined_scores["tag_score"] = combined_scores["tag_score"].fillna(0)
+            combined_scores["potential_quartile"] = combined_scores["potential_quartile"].fillna(0)
+            combined_scores['pageview_range'] = combined_scores['pageview_range'].apply(lambda x: [0, 0] if pd.isna(x) else x)
 
             scores = self.scorer.compute_weighted_score(combined_scores)
 
