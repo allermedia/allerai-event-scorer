@@ -66,8 +66,6 @@ class EventHandler:
                 .merge(tag_scores, on=["id", "site_domain"], how="left")
             )
             combined_scores["tag_score"] = combined_scores["tag_score"].fillna(0)
-            combined_scores["potential_quartile"] = combined_scores["potential_quartile"].fillna(0)
-            combined_scores['pageview_range'] = combined_scores['pageview_range'].apply(lambda x: [0, 0] if pd.isna(x) else x)
 
             scores = self.scorer.compute_weighted_score(combined_scores)
 
@@ -76,6 +74,9 @@ class EventHandler:
                 on=['id', 'site_domain'],
                 how='left'
             )
+            
+            final["potential_quartile"] = final["potential_quartile"].fillna(0)
+            final['pageview_range'] = final['pageview_range'].apply(lambda x: [0, 0] if pd.isna(x) else x)
 
             payload = final.to_dict(orient="records")
             self.pubsub_service.publish(payload, attributes)
