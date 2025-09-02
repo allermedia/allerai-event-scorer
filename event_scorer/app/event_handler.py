@@ -11,6 +11,7 @@ from parsers import RequestParser
 from pubsub import PubSubService
 from typing import Any, Dict
 import pandas as pd
+import numpy as np
 import logging
 
 logger = logging.getLogger(__name__)
@@ -76,7 +77,7 @@ class EventHandler:
             )
             
             final["potential_quartile"] = final["potential_quartile"].fillna(0)
-            final['pageview_range'] = final['pageview_range'].apply(lambda x: [0, 0] if pd.isna(x) else x)
+            final['pageview_range'] = final['pageview_range'].apply(self.fill_nan_list)
 
             payload = final.to_dict(orient="records")
             self.pubsub_service.publish(payload, attributes)
@@ -103,3 +104,11 @@ class EventHandler:
         }
         return error_log
     
+    def fill_nan_list(self, x):
+        if x is None:
+            return [0, 0]
+        if isinstance(x, float) and np.isnan(x):
+            return [0, 0]
+        if isinstance(x, np.ndarray):
+            return x.tolist()
+        return x
