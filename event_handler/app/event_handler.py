@@ -34,7 +34,7 @@ class EventHandler:
                 for html_field in ["title", "teaser", "body"]:
                     payload[html_field] = self._sanitize_html(payload[html_field])
 
-                self.pubsub_service.publish(payload)
+                #self.pubsub_service.publish(payload)
                 logger.info(f"Published payload for enrichment with id: {current_id}")
             
             return jsonify({"status": "success", "processed_count": len(payloads)}), 200
