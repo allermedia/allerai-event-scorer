@@ -30,6 +30,12 @@ resource "google_cloud_run_service" "service" {
   location = each.value.location
 
   template {
+    metadata {
+      annotations = {
+        "autoscaling.knative.dev/minScale" = tostring(each.value.scaling.min_instance_count)
+        "autoscaling.knative.dev/maxScale" = tostring(each.value.scaling.max_instance_count)
+      }
+    }
     spec {
       containers {
         image = "${var.image_url}/${var.project_id}/docker/${each.value.image}:latest"
@@ -60,13 +66,7 @@ resource "google_cloud_run_service" "service" {
       }
 
       service_account_name = each.value.service_account
-      dynamic "autoscaling" {
-        for_each = [each.value.scaling]
-        content {
-          min_instance_count = autoscaling.value.min_instance_count
-          max_instance_count = autoscaling.value.max_instance_count
-        }
-      }
+
     }
   }
 
