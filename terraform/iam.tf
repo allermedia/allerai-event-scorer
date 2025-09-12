@@ -21,6 +21,11 @@ resource "google_cloud_run_service_iam_member" "allow_pubsub_push" {
   location = var.region
   role     = "roles/run.invoker"
   member   = "serviceAccount:aller-ai-pubsub-sa@aller-content-tool.iam.gserviceaccount.com"
+
+  
+  depends_on = [
+    google_cloud_run_service.service
+  ]
 }
 
 resource "google_service_account_iam_member" "allow_pubsub_to_impersonate_pubsub_sa" {
