@@ -60,6 +60,13 @@ resource "google_cloud_run_service" "service" {
       }
 
       service_account_name = each.value.service_account
+      dynamic "scaling" {
+        for_each = [each.value.scaling]
+        content {
+          min_instance_count = scaling.value.min_instance_count
+          max_instance_count = scaling.value.max_instance_count
+        }
+      }
     }
   }
 
