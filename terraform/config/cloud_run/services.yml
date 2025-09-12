@@ -1,5 +1,7 @@
 - name: allerai-scorer
   image: allerai-scorer
+  scaling:
+    max_instance_count: 5
   service_account: aller-ai-sa@aller-content-tool.iam.gserviceaccount.com
   env_vars:
     - TARGET_PROJECT_ID
