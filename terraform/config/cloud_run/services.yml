@@ -1,6 +1,7 @@
 - name: allerai-scorer
   image: allerai-scorer
   scaling:
+    min_instance_count: 0
     max_instance_count: 5
   service_account: aller-ai-sa@aller-content-tool.iam.gserviceaccount.com
   env_vars:
