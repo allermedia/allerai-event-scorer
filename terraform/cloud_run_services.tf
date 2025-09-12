@@ -22,45 +22,58 @@ locals {
     service.name => merge(local.cloud_run_service_defaults, service)
   }
 }
-resource "google_cloud_run_v2_service" "services" {
+
+resource "google_cloud_run_service" "service" {
   for_each = local.cloudrun_merged
 
   name     = each.value.name
   location = each.value.location
 
   template {
-    containers {
-      image = "${var.image_url}/${var.project_id}/docker/${each.value.image}:latest"
+    spec {
+      containers {
+        image = "${var.image_url}/${var.project_id}/docker/${each.value.image}:latest"
 
-      resources {
-        limits = {
-          memory = each.value.resources.memory
-          cpu    = each.value.resources.cpu
-        }
-      }
-
-      ports {
-        container_port = try(each.value.port, local.cloud_run_service_defaults.port)
-      }
-
-      dynamic "env" {
-        for_each = {
-          for k in each.value.env_vars : k => lookup(var.env_vars, k, null)
-          if lookup(var.env_vars, k, null) != null
+        resources {
+          limits = {
+            memory = each.value.resources.memory
+            cpu    = each.value.resources.cpu
+          }
         }
 
+        ports {
+          container_port = try(each.value.port, local.cloud_run_service_defaults.port)
+        }
+
+        dynamic "env" {
+          for_each = {
+            for k in each.value.env_vars : k => lookup(var.env_vars, k, null)
+            if lookup(var.env_vars, k, null) != null
+          }
+
+          content {
+            name  = env.key
+            value = env.value
+          }
+        }
+        
+      }
+
+      service_account_name = each.value.service_account
+      dynamic "autoscaling" {
+        for_each = [each.value.scaling]
         content {
-          name  = env.key
-          value = env.value
+          min_instance_count = autoscaling.value.min_instance_count
+          max_instance_count = autoscaling.value.max_instance_count
         }
       }
-    }
-
-    service_account = each.value.service_account
-
-    scaling {
-      min_instance_count = try(each.value.scaling.min_instance_count, local.cloud_run_service_defaults.scaling.min_instance_count)
-      max_instance_count = try(each.value.scaling.max_instance_count, local.cloud_run_service_defaults.scaling.max_instance_count)
     }
   }
+
+  traffic {
+    percent         = 100
+    latest_revision = true
+  }
+
+  autogenerate_revision_name = true
 }
