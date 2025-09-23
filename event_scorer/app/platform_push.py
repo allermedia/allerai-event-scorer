@@ -42,8 +42,7 @@ def platform_push(payload):
 
     response = requests.post(ENDPOINT, json=filtered_payload, headers=headers)
     logger.info(f"AI Platform Status Code: {response.status_code}")
-
-    return payload
+    logger.info(f"AI Platform Response Content: {response.content.decode('utf-8')}")
 
 def transform_row(row):
     return {
