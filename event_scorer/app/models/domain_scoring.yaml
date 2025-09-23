@@ -9,7 +9,7 @@
 #     v1:
 #       embedding_similarity: 0.5               # weighted
 #       category_similarity: 0.3                # weighted
-#       tag_score:
+#       tag_score:S
 #         type: additive
 #         value: 0.5
 #
