@@ -83,9 +83,8 @@ class EventHandler:
             payload = final.to_dict(orient="records")
             self.pubsub_service.publish(payload, attributes)
 
-            payload_transformed = platform_push(final)
-
-            logger.info(f"Pushed to platform: {payload_transformed}")
+            # Push to AI Platform
+            platform_push(final)
 
             logger.info(f"Published scores for article_id: {df_event['article_id'].iloc[0]}")
             return jsonify({"status": "success"}), 200      
