@@ -77,7 +77,7 @@ class EventHandler:
                 how='left'
             )
             
-            final["potential_quartile"] = final["potential_quartile"].fillna(0)
+            final["potential_quartile"] = final["potential_quartile"].fillna(1)
             final['pageview_range'] = final['pageview_range'].apply(self.fill_nan_list)
 
             payload = final.to_dict(orient="records")
