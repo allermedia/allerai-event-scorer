@@ -6,6 +6,7 @@ from features.classification import ClassificationScorer
 from features.tags import TagScorer
 from features.potential import PotentialScorer
 from scoring.scoring_weighted import Scorer
+from platform_push import platform_push
 from data_access import DataManager
 from parsers import RequestParser
 from pubsub import PubSubService
@@ -81,6 +82,10 @@ class EventHandler:
 
             payload = final.to_dict(orient="records")
             self.pubsub_service.publish(payload, attributes)
+
+            payload = platform_push(payload)
+
+            logger.info(f"Pushed to platform: {payload}")
 
             logger.info(f"Published scores for article_id: {df_event['article_id'].iloc[0]}")
             return jsonify({"status": "success"}), 200      

@@ -6,6 +6,8 @@
   service_account: aller-ai-sa@aller-content-tool.iam.gserviceaccount.com
   env_vars:
     - TARGET_PROJECT_ID
+    - PLATFORM_API_KEY
+    - PLATFORM_ENDPOINT
 
 - name: allerai-event-handler
   image: allerai-event-handler
