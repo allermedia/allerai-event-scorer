@@ -111,9 +111,9 @@ class EventHandler:
     
     def fill_nan_list(self, x):
         if x is None:
-            return [0, 0]
+            return [0, 1]
         if isinstance(x, float) and np.isnan(x):
-            return [0, 0]
+            return [0, 1]
         if isinstance(x, np.ndarray):
             return x.tolist()
         return x
