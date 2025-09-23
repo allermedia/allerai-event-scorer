@@ -13,10 +13,28 @@ def platform_push(payload):
     transformed = payload.apply(transform_row, axis=1).tolist()
 
     # Temporary filter as platform does not accept these sites
-    unsupported_sites = ["familiejournal.dk", "svenskdam.se", "udeoghjemme.dk"]
+    supported_sites = [
+        "allas.se",
+        "billedbladet.dk",
+        "dagbladet.no",
+        "elbil24.no",
+        "elle.se",
+        "femina.dk",
+        "femina.se",
+        "hant.se",
+        "isabellas.dk",
+        "kk.no",
+        "mabra.com",
+        "residencemagazine.se",
+        "seher.no",
+        "seiska.fi",
+        "seoghoer.dk",
+        "sol.no",
+        "vielskerserier.dk"
+    ]
     filtered_payload = [
         row for row in transformed
-        if row["audience_site"] not in unsupported_sites
+        if row["audience_site"] in supported_sites
     ]
 
     response = requests.post(ENDPOINT, json=filtered_payload, headers=headers)
