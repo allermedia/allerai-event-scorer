@@ -10,9 +10,16 @@ def platform_push(payload):
         "x-api-key": API_KEY
     }
 
-    payload = payload.apply(transform_row, axis=1).tolist()
+    transformed = payload.apply(transform_row, axis=1).tolist()
 
-    response = requests.post(ENDPOINT, json=payload, headers=headers)
+    # Temporary filter as platform does not accept these sites
+    unsupported_sites = ["familiejournal.dk", "svenskdam.se", "udeoghjemme.dk"]
+    filtered_payload = [
+        row for row in transformed
+        if row["audience_site"] not in unsupported_sites
+    ]
+
+    response = requests.post(ENDPOINT, json=filtered_payload, headers=headers)
 
     print(f"AI Platform Status Code: {response.status_code}")
 
