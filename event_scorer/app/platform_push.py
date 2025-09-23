@@ -15,7 +15,8 @@ def platform_push(payload):
     response = requests.post(ENDPOINT, json=payload, headers=headers)
 
     print(f"AI Platform Status Code: {response.status_code}")
-    print(f"AI Platform Response Content: {response.content.decode('utf-8')}")  
+
+    return payload
 
 
 def transform_row(row):
