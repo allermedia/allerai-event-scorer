@@ -1,5 +1,8 @@
 import requests
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 API_KEY = os.getenv("PLATFORM_API_KEY", "API_KEY not set")
 ENDPOINT = os.getenv("PLATFORM_ENDPOINT", "PLATFORM_ENDPOINT not set")
@@ -38,11 +41,9 @@ def platform_push(payload):
     ]
 
     response = requests.post(ENDPOINT, json=filtered_payload, headers=headers)
-
-    print(f"AI Platform Status Code: {response.status_code}")
+    logger.info(f"AI Platform Status Code: {response.status_code}")
 
     return payload
-
 
 def transform_row(row):
     return {
