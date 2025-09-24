@@ -57,7 +57,7 @@ class EventHandler:
             )
 
             # Score event
-            logger.info(f"Scoring article_id: {df_event['article_id'].iloc[0]}...")
+            logger.info(f"Scoring article_id: {df_event['article_id'].iloc[0]}, for domain {df_event['site_domain']}...")
             potential_scores = self.potential_scorer.predict_classification(df_event, df_articles)
             similarity_scores = self.similarity_scorer.embedding_relevance(df_event, df_articles)
             classification_scores = self.classification_scorer.category_relevance(df_event, df_articles)
