@@ -108,18 +108,18 @@ class EventHandler:
         }
         return error_log
     
-def fill_nan_list(self, x):
-    if x is None:
-        return [0, 1]
-    if isinstance(x, float) and np.isnan(x):
-        return [0, 1]
+    def fill_nan_list(self, x):
+        if x is None:
+            return [0, 1]
+        if isinstance(x, float) and np.isnan(x):
+            return [0, 1]
 
-    if isinstance(x, np.ndarray):
-        x = x.tolist()
+        if isinstance(x, np.ndarray):
+            x = x.tolist()
 
-    if isinstance(x, list) and len(x) == 2:
-        min_val = max(0, x[0]) 
-        max_val = max(1, x[1]) 
-        return [min_val, max_val]
-
-    return x
+        if isinstance(x, list) and len(x) == 2:
+            min_val = max(0, x[0]) 
+            max_val = max(1, x[1]) 
+            return [min_val, max_val]
+        
+        return x
