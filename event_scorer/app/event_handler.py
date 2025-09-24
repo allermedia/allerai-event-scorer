@@ -14,6 +14,7 @@ from typing import Any, Dict
 import pandas as pd
 import numpy as np
 import logging
+import tldextract
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -81,7 +82,10 @@ class EventHandler:
 
             # Format final output
             site_value = df_event["site_domain"].iloc[0]
-            final["id"] = site_value + ":" + final["id"].astype(str)
+            extracted = tldextract.extract(site_value)
+            base_domain = f"{extracted.domain}.{extracted.suffix}" if extracted.domain and extracted.suffix else None
+
+            final["id"] = base_domain + ":" + final["id"].astype(str)
             final["potential_quartile"] = final["potential_quartile"].fillna(1)
             final['pageview_range'] = final['pageview_range'].apply(self.fill_nan_list)
 
