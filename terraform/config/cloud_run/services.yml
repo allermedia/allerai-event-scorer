@@ -3,6 +3,9 @@
   scaling:
     min_instance_count: 0
     max_instance_count: 5
+  resources:
+    cpu: 1
+    memory: 4Gi
   service_account: aller-ai-sa@aller-content-tool.iam.gserviceaccount.com
   env_vars:
     - TARGET_PROJECT_ID
