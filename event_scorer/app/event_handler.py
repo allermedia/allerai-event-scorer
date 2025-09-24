@@ -43,6 +43,9 @@ class EventHandler:
                 return jsonify({"status": "error", "reason": "Invalid JSON payload"}), 400
         
             df_event = self.request_parser.payload_to_df(payload)
+            site_value = df_event["site_domain"].iloc[0]
+            extracted = tldextract.extract(site_value)
+            base_domain = f"{extracted.domain}.{extracted.suffix}" if extracted.domain and extracted.suffix else None
 
             # Get stored data
             dfs = self.data_manager.get_dataframes()
@@ -57,7 +60,7 @@ class EventHandler:
             )
 
             # Score event
-            logger.info(f"Scoring article_id: {df_event['article_id'].iloc[0]}...")
+            logger.info(f"Scoring article_id: {df_event['article_id'].iloc[0]}, for domain: {base_domain}...")
             potential_scores = self.potential_scorer.predict_classification(df_event, df_articles)
             similarity_scores = self.similarity_scorer.embedding_relevance(df_event, df_articles)
             classification_scores = self.classification_scorer.category_relevance(df_event, df_articles)
@@ -81,9 +84,6 @@ class EventHandler:
             )
 
             # Format final output
-            site_value = df_event["site_domain"].iloc[0]
-            extracted = tldextract.extract(site_value)
-            base_domain = f"{extracted.domain}.{extracted.suffix}" if extracted.domain and extracted.suffix else None
 
             final["id"] = base_domain + ":" + final["id"].astype(str)
             final["potential_quartile"] = final["potential_quartile"].fillna(1)
