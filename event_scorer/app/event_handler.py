@@ -43,6 +43,7 @@ class EventHandler:
         
             df_event = self.request_parser.payload_to_df(payload)
 
+            # Get stored data
             dfs = self.data_manager.get_dataframes()
             df_articles = dfs["articles"]
             df_tag_scores = dfs["tag_scores"]
@@ -54,33 +55,39 @@ class EventHandler:
                 how='left'
             )
 
-            potential_scores = self.potential_scorer.predict_classification(df_event, df_articles)
-
+            # Score event
             logger.info(f"Scoring article_id: {df_event['article_id'].iloc[0]}...")
-
+            potential_scores = self.potential_scorer.predict_classification(df_event, df_articles)
             similarity_scores = self.similarity_scorer.embedding_relevance(df_event, df_articles)
             classification_scores = self.classification_scorer.category_relevance(df_event, df_articles)
             tag_scores = self.tag_scorer.tag_relevance(df_event, df_tag_scores)
 
+
+            # Combine scores and compute final weighted score
             combined_scores = (
                 similarity_scores
                 .merge(classification_scores, on=["id", "site_domain"], how="inner")
                 .merge(tag_scores, on=["id", "site_domain"], how="left")
             )
+
             combined_scores["tag_score"] = combined_scores["tag_score"].fillna(0)
 
             scores = self.scorer.compute_weighted_score(combined_scores)
-
             final = scores.merge(
                 potential_scores[['id', 'site_domain', 'potential_quartile', 'pageview_range']],
                 on=['id', 'site_domain'],
                 how='left'
             )
-            
+
+            # Format final output
+            site_value = df_event["site_domain"].iloc[0]
+            final["id"] = site_value + ":" + final["id"].astype(str)
             final["potential_quartile"] = final["potential_quartile"].fillna(1)
             final['pageview_range'] = final['pageview_range'].apply(self.fill_nan_list)
 
             payload = final.to_dict(orient="records")
+
+            # Publish to Pub/Sub
             self.pubsub_service.publish(payload, attributes)
 
             # Push to AI Platform
