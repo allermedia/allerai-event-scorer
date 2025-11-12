@@ -1,0 +1,4 @@
+dlt==1.9.0
+dlt[bigquery]
+google-cloud-bigquery
+google-auth

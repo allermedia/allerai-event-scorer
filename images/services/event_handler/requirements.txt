@@ -1,0 +1,7 @@
+flask==2.3.3
+functions-framework==3.4.0
+google-cloud-pubsub==2.21.0
+google-auth==2.29.0
+requests==2.31.0
+beautifulsoup4
+lxml

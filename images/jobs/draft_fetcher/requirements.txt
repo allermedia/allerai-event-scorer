@@ -1,0 +1,5 @@
+dlt==1.9.0
+dlt[bigquery]
+pymongo
+google-cloud-bigquery
+google-auth
