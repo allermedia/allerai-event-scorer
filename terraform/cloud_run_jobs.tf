@@ -13,14 +13,14 @@ locals {
     service_account = null
   }
 
-  cloudrun_merged = {
+  cloudrun_jobs_merged = {
     for job in local.cloudrun_jobs :
     job.name => merge(local.cloud_run_job_defaults, job)
   }
 }
 
 resource "google_cloud_run_v2_job" "jobs" {
-  for_each = local.cloudrun_merged
+  for_each = local.cloudrun_jobs_merged
 
   name     = each.value.name
   location = each.value.location
