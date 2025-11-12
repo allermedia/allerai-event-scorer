@@ -11,6 +11,7 @@ locals {
     location        = "europe-north2"
     task_timeout    = "3600s"
     service_account = null
+    env_vars = []
   }
 
   cloudrun_jobs_merged = {

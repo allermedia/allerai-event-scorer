@@ -15,12 +15,10 @@
 - name: page-fetcher
   image: page-fetcher
   service_account: aller-ai-sa@aller-content-tool.iam.gserviceaccount.com
-  env_vars:
 
 - name: pageview-fetcher
   image: pageview-fetcher
   service_account: aller-ai-sa@aller-content-tool.iam.gserviceaccount.com
-  env_vars:
 
 - name: matching-service
   image: matching-service
