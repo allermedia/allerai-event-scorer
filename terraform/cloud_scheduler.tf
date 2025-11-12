@@ -24,7 +24,7 @@ resource "google_cloud_scheduler_job" "cloud_run_jobs" {
     http_method = "POST"
     uri         = "https://run.googleapis.com/v2/projects/${var.project_id}/locations/${google_cloud_run_v2_job.jobs[each.value.job_name].location}/jobs/${google_cloud_run_v2_job.jobs[each.value.job_name].name}:run"
     oauth_token {
-      service_account_email = google_service_account.service_accounts["cloud-run-invoker"].email
+      service_account_email = "aller-ai-sa@aller-content-tool.iam.gserviceaccount.com"
     }
   }
 
