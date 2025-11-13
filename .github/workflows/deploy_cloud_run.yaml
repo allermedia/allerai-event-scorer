@@ -37,7 +37,7 @@ jobs:
     if: ${{ fromJSON(needs.detect-changed.outputs.matrix) != '[]' }}
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJSON(needs.detect-changed.outputs.matrix || '[]') }}
+      matrix: ${{ fromJSON(needs.detect-changed.outputs.matrix) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

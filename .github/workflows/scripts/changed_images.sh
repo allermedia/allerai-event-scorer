@@ -34,15 +34,21 @@ else
   done <<< "$CHANGED_FILES"
 fi
 
-# Output JSON
-MATRIX_JSON="["
-for i in "${!CHANGED_IMAGES[@]}"; do
-  TYPE=$(echo "${CHANGED_IMAGES[i]}" | cut -d/ -f1)
-  NAME=$(echo "${CHANGED_IMAGES[i]}" | cut -d/ -f2)
+# Build JSON using jq for safety
+ITEMS=()
+for IMG in "${CHANGED_IMAGES[@]}"; do
+  TYPE=$(echo "$IMG" | cut -d/ -f1)
+  NAME=$(echo "$IMG" | cut -d/ -f2)
   FOLDER="images/$TYPE/$NAME"
-  MATRIX_JSON+="{\"type\":\"$TYPE\",\"name\":\"$NAME\",\"folder\":\"$FOLDER\"}"
-  [[ $i -lt $((${#CHANGED_IMAGES[@]}-1)) ]] && MATRIX_JSON+=","
+  ITEMS+=($(jq -n --arg type "$TYPE" --arg name "$NAME" --arg folder "$FOLDER" \
+             '{type:$type,name:$name,folder:$folder}'))
 done
-MATRIX_JSON+="]"
 
+MATRIX_JSON=$(jq -n --argjson items "[${ITEMS[*]}]" '$items')
+
+# Debug: print matrix for logs
+echo "🟢 Changed images matrix:"
+echo "$MATRIX_JSON" | jq .
+
+# Output to GitHub Actions
 echo "matrix=$MATRIX_JSON" >> $GITHUB_OUTPUT
