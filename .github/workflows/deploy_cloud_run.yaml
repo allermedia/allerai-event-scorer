@@ -12,7 +12,7 @@ jobs:
   detect-changed:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.build-matrix.outputs.matrix }}
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -20,18 +20,26 @@ jobs:
           fetch-depth: 2
 
       - name: Build matrix
-        id: build-matrix
+        id: set-matrix
         run: |
           chmod +x .github/workflows/scripts/changed_images.sh
-          .github/workflows/scripts/changed_images.sh "${{ github.event_name }}" "${{ github.event.before }}" "${{ github.sha }}"
+
+          # Get list of changed files for push events
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            CHANGED_FILES=""
+          else
+            CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          fi
+
+          # Call the matrix script
+          .github/workflows/scripts/changed_images.sh "${{ github.event_name }}" "$CHANGED_FILES"
 
   build-and-deploy:
     needs: detect-changed
-    if: ${{ needs.detect-changed.outputs.matrix != '[]' }}
+    if: ${{ fromJSON(needs.detect-changed.outputs.matrix || '[]') != [] }}
     runs-on: ubuntu-latest
     strategy:
       matrix: ${{ fromJSON(needs.detect-changed.outputs.matrix || '[]') }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -41,20 +49,41 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA }}
 
-      - name: Build & push Docker image
+      - name: Configure Docker client
+        run: |
+          gcloud auth configure-docker europe-docker.pkg.dev
+
+      - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
           context: ${{ matrix.folder }}
           push: true
           tags: europe-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/${{ matrix.name }}:latest
 
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
       - name: Deploy to Cloud Run
         run: |
           IMAGE_URL="europe-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/${{ matrix.name }}:latest"
           REGION="europe-north2"
 
+          echo "Deploying ${{ matrix.type }}: ${{ matrix.name }} with image $IMAGE_URL..."
+
           if [ "${{ matrix.type }}" == "services" ]; then
-            gcloud run services update ${{ matrix.name }} --image=$IMAGE_URL --region=$REGION || echo "Service not found, deploy infra first"
-          else
-            gcloud run jobs update ${{ matrix.name }} --image=$IMAGE_URL --region=$REGION || echo "Job not found, deploy infra first"
+            if gcloud run services describe ${{ matrix.name }} --region=$REGION &> /dev/null; then
+              gcloud run services update ${{ matrix.name }} \
+                --image=$IMAGE_URL \
+                --region=$REGION
+            else
+              echo "INFO: Service not found. Please deploy service with infra first."
+            fi
+          elif [ "${{ matrix.type }}" == "jobs" ]; then
+            if gcloud run jobs describe ${{ matrix.name }} --region=$REGION &> /dev/null; then
+              gcloud run jobs update ${{ matrix.name }} \
+                --image=$IMAGE_URL \
+                --region=$REGION
+            else
+              echo "INFO: Job not found. Please deploy job with infra first."
+            fi
           fi

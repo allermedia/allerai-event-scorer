@@ -1,24 +1,33 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -euo pipefail
 
+# Usage: ./changed_images.sh <event_name> <changed_files>
 EVENT_NAME=$1
-BEFORE_SHA=$2
-HEAD_SHA=$3
+CHANGED_FILES=$2
 
-MATRIX_ITEMS=()
+# Array for changed images
+CHANGED_IMAGES=()
 
+# Flag to check if we need to rebuild all images
+REBUILD_ALL=false
+
+# Check if the event is workflow_dispatch to rebuild all
+if [ "$EVENT_NAME" == "workflow_dispatch" ]; then
+  REBUILD_ALL=true
+fi
+
+# Function to add folders to CHANGED_IMAGES avoiding duplicates
 add_to_matrix() {
   TYPE=$1
   FOLDER=$2
   NAME=$(basename "$FOLDER")
-  # Only include if Dockerfile exists
-  if [ -f "$FOLDER/Dockerfile" ]; then
-    MATRIX_ITEMS+=("{\"type\":\"$TYPE\",\"name\":\"$NAME\",\"folder\":\"$FOLDER\"}")
+  if ! printf '%s\n' "${CHANGED_IMAGES[@]}" | grep -qx "$TYPE/$NAME"; then
+    CHANGED_IMAGES+=("$TYPE/$NAME")
   fi
 }
 
-# Include all on manual run
-if [ "$EVENT_NAME" == "workflow_dispatch" ]; then
+if [ "$REBUILD_ALL" = true ]; then
+  # Add all folders under services and jobs
   for TYPE in services jobs; do
     [ -d "images/$TYPE" ] || continue
     for FOLDER in images/$TYPE/*; do
@@ -27,31 +36,36 @@ if [ "$EVENT_NAME" == "workflow_dispatch" ]; then
     done
   done
 else
-  # Detect changes on push
-  if [ -n "$BEFORE_SHA" ] && [ "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ]; then
-    DIFF_RANGE="$BEFORE_SHA $HEAD_SHA"
-  else
-    DIFF_RANGE="$HEAD_SHA~1 $HEAD_SHA"
-  fi
-
-  CHANGED=$(git diff --name-only $DIFF_RANGE | grep '^images/' || true)
-  for path in $CHANGED; do
-    TYPE=$(echo "$path" | cut -d/ -f2)
-    NAME=$(echo "$path" | cut -d/ -f3)
-    FOLDER="images/$TYPE/$NAME"
-    [ -d "$FOLDER" ] || continue
-    add_to_matrix "$TYPE" "$FOLDER"
+  # Only include folders for changed files
+  for file in $CHANGED_FILES; do
+    if [[ $file == images/* ]]; then
+      TYPE=$(echo "$file" | cut -d/ -f2)
+      NAME=$(echo "$file" | cut -d/ -f3)
+      FOLDER="images/$TYPE/$NAME"
+      [ -d "$FOLDER" ] || continue
+      add_to_matrix "$TYPE" "$FOLDER"
+    fi
   done
 fi
 
-# Build JSON array
-if [ ${#MATRIX_ITEMS[@]} -gt 0 ]; then
-  MATRIX_JSON="["
-  MATRIX_JSON+=$(IFS=,; echo "${MATRIX_ITEMS[*]}")
-  MATRIX_JSON+="]"
-else
+# Create JSON matrix
+if [ ${#CHANGED_IMAGES[@]} -eq 0 ]; then
   MATRIX_JSON="[]"
+else
+  ITEMS=()
+  for img in "${CHANGED_IMAGES[@]}"; do
+    TYPE=$(echo "$img" | cut -d/ -f1)
+    NAME=$(echo "$img" | cut -d/ -f2)
+    FOLDER="images/$TYPE/$NAME"
+    ITEMS+=("{\"type\":\"$TYPE\",\"name\":\"$NAME\",\"folder\":\"$FOLDER\"}")
+  done
+  MATRIX_JSON="["
+  MATRIX_JSON+=$(IFS=,; echo "${ITEMS[*]}")
+  MATRIX_JSON+="]"
 fi
+
+# Debug info to stderr
+echo "Matrix JSON: $MATRIX_JSON" >&2
 
 # Output for GitHub Actions
 echo "matrix=$MATRIX_JSON" >> $GITHUB_OUTPUT
