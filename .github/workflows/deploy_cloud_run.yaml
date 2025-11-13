@@ -30,7 +30,7 @@ jobs:
       - name: Build matrix
         id: set-matrix
         run: |
-          MATRIX_OUTPUT=$(.github/workflows/scripts/changed-images.sh "${{ github.event_name }}" "${{ steps.changed-files.outputs.all_changed_files }}")
+          MATRIX_OUTPUT=$(.github/workflows/scripts/changed_images.sh "${{ github.event_name }}" "${{ steps.changed-files.outputs.all_changed_files }}")
           echo "$MATRIX_OUTPUT" >> $GITHUB_OUTPUT
 
   build-and-deploy:
