@@ -1,0 +1,8 @@
+google-cloud-bigquery==3.8.0
+pandas==2.1.4
+numpy==1.26.4
+pydantic>=2.7.4
+db-dtypes
+google-auth
+scipy
+tqdm

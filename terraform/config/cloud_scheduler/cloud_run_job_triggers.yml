@@ -1,0 +1,29 @@
+data-enrichment-weekly:
+  description: Triggers the data-enrichment job weekly at 7 AM each monday.
+  job_name: data-enrichment
+  schedule: "0 7 * * 1"
+  time_zone: Europe/Copenhagen
+
+draft-fetcher-weekly:
+  description: Triggers the draft-fetcher job weekly at 6 AM each monday.
+  job_name: draft-fetcher
+  schedule: "0 6 * * 1"
+  time_zone: Europe/Copenhagen
+
+page-fetcher-weekly:
+  description: Triggers the page-fetcher job weekly at 6 AM each monday.
+  job_name: page-fetcher
+  schedule: "0 6 * * 1"
+  time_zone: Europe/Copenhagen
+
+pageview-fetcher-weekly:
+  description: Triggers the pageview-fetcher job weekly at 6 AM each monday.
+  job_name: pageview-fetcher
+  schedule: "0 6 * * 1"
+  time_zone: Europe/Copenhagen
+
+matching-service-weekly:
+  description: Triggers the matching-service job weekly at 8 AM each monday.
+  job_name: matching-service
+  schedule: "0 8 * * 1"
+  time_zone: Europe/Copenhagen

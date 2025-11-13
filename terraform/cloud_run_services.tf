@@ -17,14 +17,14 @@ locals {
     env_vars        = []
   }
 
-  cloudrun_merged = {
+  cloudrun_services_merged = {
     for service in local.cloudrun_services :
     service.name => merge(local.cloud_run_service_defaults, service)
   }
 }
 
 resource "google_cloud_run_service" "service" {
-  for_each = local.cloudrun_merged
+  for_each = local.cloudrun_services_merged
 
   name     = each.value.name
   location = each.value.location

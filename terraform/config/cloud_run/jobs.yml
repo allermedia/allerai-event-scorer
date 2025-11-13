@@ -1,0 +1,25 @@
+- name: data-enrichment
+  image: data-enrichment
+  service_account: aller-ai-sa@aller-content-tool.iam.gserviceaccount.com
+  env_vars:
+    - openai_api_key
+
+- name: draft-fetcher
+  image: draft-fetcher
+  service_account: aller-ai-sa@aller-content-tool.iam.gserviceaccount.com
+  env_vars:
+    - MONGO_URI
+    - MONGO_DB
+    - MONGO_COLLECTION
+
+- name: page-fetcher
+  image: page-fetcher
+  service_account: aller-ai-sa@aller-content-tool.iam.gserviceaccount.com
+
+- name: pageview-fetcher
+  image: pageview-fetcher
+  service_account: aller-ai-sa@aller-content-tool.iam.gserviceaccount.com
+
+- name: matching-service
+  image: matching-service
+  service_account: aller-ai-sa@aller-content-tool.iam.gserviceaccount.com
