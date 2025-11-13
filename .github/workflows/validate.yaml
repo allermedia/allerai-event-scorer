@@ -38,6 +38,8 @@ jobs:
           ENV_VARS="{
             TARGET_PROJECT_ID = \"${{ secrets.ADP_PROJECT_ID }}\",
             OUTPUT_TOPIC = \"${{ secrets.ADP_ENRICHMENT_TOPIC }}\",
+            PLATFORM_API_KEY = \"${{ secrets.PLATFORM_API_KEY }}\",
+            PLATFORM_ENDPOINT = \"${{ secrets.PLATFORM_ENDPOINT }}\",
             MONGO_URI = \"${{ secrets.MONGO_URI_DRAFTS }}\",
             MONGO_DB = \"${{ secrets.MONGO_DB_DRAFTS }}\",
             MONGO_COLLECTION = \"${{ secrets.MONGO_COLLECTION_DRAFTS }}\",
