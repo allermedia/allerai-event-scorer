@@ -10,14 +10,12 @@ add_to_matrix() {
   TYPE=$1
   NAME=$2
   ENTRY="$TYPE/$NAME"
-  # Avoid duplicates
   for e in "${CHANGED_IMAGES[@]}"; do
     [[ "$e" == "$ENTRY" ]] && return
   done
   CHANGED_IMAGES+=("$ENTRY")
 }
 
-# If workflow_dispatch, rebuild all images under services and jobs
 if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
   for TYPE in services jobs; do
     for DIR in images/$TYPE/*/; do
@@ -27,7 +25,6 @@ if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
     done
   done
 else
-  # Process only changed files
   while IFS= read -r file; do
     [[ "$file" != images/* ]] && continue
     TYPE=$(echo "$file" | cut -d/ -f2)
@@ -37,24 +34,15 @@ else
   done <<< "$CHANGED_FILES"
 fi
 
-# Build JSON matrix
-if [ ${#CHANGED_IMAGES[@]} -eq 0 ]; then
-  MATRIX_JSON="[]"
-else
-  ITEMS=()
-  for img in "${CHANGED_IMAGES[@]}"; do
-    TYPE=$(echo "$img" | cut -d/ -f1)
-    NAME=$(echo "$img" | cut -d/ -f2)
-    FOLDER="images/$TYPE/$NAME"
-    ITEMS+=("{\"type\":\"$TYPE\",\"name\":\"$NAME\",\"folder\":\"$FOLDER\"}")
-  done
-  MATRIX_JSON="["
-  MATRIX_JSON+=$(IFS=,; echo "${ITEMS[*]}")
-  MATRIX_JSON+="]"
-fi
+# Output JSON
+MATRIX_JSON="["
+for i in "${!CHANGED_IMAGES[@]}"; do
+  TYPE=$(echo "${CHANGED_IMAGES[i]}" | cut -d/ -f1)
+  NAME=$(echo "${CHANGED_IMAGES[i]}" | cut -d/ -f2)
+  FOLDER="images/$TYPE/$NAME"
+  MATRIX_JSON+="{\"type\":\"$TYPE\",\"name\":\"$NAME\",\"folder\":\"$FOLDER\"}"
+  [[ $i -lt $((${#CHANGED_IMAGES[@]}-1)) ]] && MATRIX_JSON+=","
+done
+MATRIX_JSON+="]"
 
-# Debug
-echo "Matrix JSON: $MATRIX_JSON" >&2
-
-# Output for GitHub Actions
 echo "matrix=$MATRIX_JSON" >> $GITHUB_OUTPUT
