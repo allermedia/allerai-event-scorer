@@ -22,8 +22,8 @@ jobs:
       - name: Build matrix
         id: build-matrix
         run: |
-          chmod +x scripts/changed_images.sh
-          ./scripts/changed_images.sh "${{ github.event_name }}" "${{ github.event.before }}" "${{ github.sha }}"
+          chmod +x .github/workflows/scripts/changed_images.sh
+          .github/workflows/scripts/changed_images.sh "${{ github.event_name }}" "${{ github.event.before }}" "${{ github.sha }}"
 
   build-and-deploy:
     needs: detect-changed
