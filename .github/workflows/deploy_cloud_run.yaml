@@ -1,4 +1,4 @@
-name: Build, Push, and Deploy Docker Services and Jobs
+name: Build, Push, and Deploy Cloud Run Jobs and Services
 
 on:
   push:
@@ -21,32 +21,53 @@ jobs:
           fetch-depth: 2
 
       - name: Detect modified folders
-        id: detect
+        id: set-matrix
+        shell: bash
         run: |
-          echo "Detecting modified folders under images/"
-          CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^images/')
+          echo "🔍 Detecting modified folders under images/"
+
+          # Determine diff range (fallback for first run)
+          if [ -n "${{ github.event.before }}" ] && [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
+            DIFF_RANGE="${{ github.event.before }} ${{ github.sha }}"
+          else
+            # First push or manual run: compare last commit
+            DIFF_RANGE="${{ github.sha }}~1 ${{ github.sha }}"
+          fi
+
+          echo "Using diff range: $DIFF_RANGE"
+
+          # Get changed files in images folder
+          CHANGED=$(git diff --name-only $DIFF_RANGE | grep '^images/' || true)
           echo "Changed paths: $CHANGED"
 
-          MATRIX="["
+          # Build JSON matrix of changed services/jobs
+          declare -A UNIQUE_FOLDERS
           for path in $CHANGED; do
             TOP_FOLDER=$(echo "$path" | cut -d/ -f2)   # services or jobs
             SERVICE_NAME=$(echo "$path" | cut -d/ -f3) # folder name
+            FOLDER_PATH="images/$TOP_FOLDER/$SERVICE_NAME"
 
-            # only add if the folder exists
-            if [ -d "images/$TOP_FOLDER/$SERVICE_NAME" ]; then
-              MATRIX+="{\"type\":\"$TOP_FOLDER\",\"name\":\"$SERVICE_NAME\",\"folder\":\"images/$TOP_FOLDER/$SERVICE_NAME\"},"
+            if [ -n "$SERVICE_NAME" ] && [ -d "$FOLDER_PATH" ]; then
+              UNIQUE_FOLDERS["$FOLDER_PATH"]="{\"type\":\"$TOP_FOLDER\",\"name\":\"$SERVICE_NAME\",\"folder\":\"$FOLDER_PATH\"}"
             fi
           done
 
-          MATRIX="${MATRIX%,}]"
-          echo "Matrix JSON: $MATRIX"
-          echo "::set-output name=matrix::$MATRIX"
+          MATRIX_JSON="["
+          if [ ${#UNIQUE_FOLDERS[@]} -gt 0 ]; then
+            MATRIX_JSON+=$(IFS=,; echo "${UNIQUE_FOLDERS[*]}")
+          fi
+          MATRIX_JSON+="]"
+
+          echo "Final matrix JSON: $MATRIX_JSON"
+          echo "matrix=$MATRIX_JSON" >> $GITHUB_OUTPUT
 
   build-and-deploy:
     needs: detect-changed
+    if: ${{ needs.detect-changed.outputs.matrix != '[]' }}
     runs-on: ubuntu-latest
     strategy:
       matrix: ${{ fromJSON(needs.detect-changed.outputs.matrix) }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
