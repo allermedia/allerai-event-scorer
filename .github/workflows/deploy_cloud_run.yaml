@@ -44,4 +44,74 @@ jobs:
           declare -A UNIQUE_FOLDERS
           for path in $CHANGED; do
             TOP_FOLDER=$(echo "$path" | cut -d/ -f2)   # services or jobs
-            SERVICE_NAME=$(echo "$path" | cut -d/ -f3) # folder n_
+            SERVICE_NAME=$(echo "$path" | cut -d/ -f3) # folder name
+            FOLDER_PATH="images/$TOP_FOLDER/$SERVICE_NAME"
+
+            if [ -n "$SERVICE_NAME" ] && [ -d "$FOLDER_PATH" ]; then
+              UNIQUE_FOLDERS["$FOLDER_PATH"]="{\"type\":\"$TOP_FOLDER\",\"name\":\"$SERVICE_NAME\",\"folder\":\"$FOLDER_PATH\"}"
+            fi
+          done
+
+          MATRIX_JSON="["
+          if [ ${#UNIQUE_FOLDERS[@]} -gt 0 ]; then
+            MATRIX_JSON+=$(IFS=,; echo "${UNIQUE_FOLDERS[*]}")
+          fi
+          MATRIX_JSON+="]"
+
+          echo "Final matrix JSON: $MATRIX_JSON"
+          echo "matrix=$MATRIX_JSON" >> $GITHUB_OUTPUT
+
+  build-and-deploy:
+    needs: detect-changed
+    if: ${{ needs.detect-changed.outputs.matrix != '[]' }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJSON(needs.detect-changed.outputs.matrix) }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA }}
+
+      - name: Configure Docker client
+        run: |
+          gcloud auth configure-docker europe-docker.pkg.dev
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: ${{ matrix.folder }}
+          push: true
+          tags: europe-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/${{ matrix.name }}:latest
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to Cloud Run
+        run: |
+          IMAGE_URL="europe-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/docker/${{ matrix.name }}:latest"
+          REGION="europe-north2"
+
+          echo "Deploying ${{ matrix.type }}: ${{ matrix.name }} with image $IMAGE_URL..."
+
+          if [ "${{ matrix.type }}" == "services" ]; then
+            if gcloud run services describe ${{ matrix.name }} --region=$REGION &> /dev/null; then
+              gcloud run services update ${{ matrix.name }} \
+                --image=$IMAGE_URL \
+                --region=$REGION
+            else
+              echo "INFO: Service not found. Please deploy service with infrastructure code first."
+            fi
+          elif [ "${{ matrix.type }}" == "jobs" ]; then
+            if gcloud run jobs describe ${{ matrix.name }} --region=$REGION &> /dev/null; then
+              gcloud run jobs update ${{ matrix.name }} \
+                --image=$IMAGE_URL \
+                --region=$REGION
+            else
+              echo "INFO: Job not found. Please deploy job with infrastructure code first."
+            fi
+          fi
