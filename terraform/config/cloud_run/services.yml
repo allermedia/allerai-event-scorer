@@ -1,5 +1,5 @@
-- name: allerai-scorer
-  image: allerai-scorer
+- name: event-scorer
+  image: event-scorer
   scaling:
     min_instance_count: 0
     max_instance_count: 5
@@ -12,8 +12,8 @@
     - PLATFORM_API_KEY
     - PLATFORM_ENDPOINT
 
-- name: allerai-event-handler
-  image: allerai-event-handler
+- name: event-handler
+  image: event-handler
   service_account: aller-ai-sa@aller-content-tool.iam.gserviceaccount.com
   env_vars:
     - TARGET_PROJECT_ID

@@ -83,9 +83,7 @@ jobs:
                 --image=$IMAGE_URL \
                 --region=$REGION
             else
-              gcloud run deploy ${{ matrix.name }} \
-                --image=$IMAGE_URL \
-                --region=$REGION
+              echo "INFO: Service not found. Please deploy service with infrastructure code first."
             fi
           elif [ "${{ matrix.type }}" == "jobs" ]; then
             if gcloud run jobs describe ${{ matrix.name }} --region=$REGION &> /dev/null; then
@@ -93,10 +91,6 @@ jobs:
                 --image=$IMAGE_URL \
                 --region=$REGION
             else
-              gcloud run jobs deploy ${{ matrix.name }} \
-                --image=$IMAGE_URL \
-                --region=$REGION
+              echo "INFO: Job not found. Please deploy job with infrastructure code first."
             fi
-            # execute the job
-            gcloud run jobs execute ${{ matrix.name }} --region=$REGION
           fi

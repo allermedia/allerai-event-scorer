@@ -7,7 +7,7 @@ def run_pipeline():
     print("Running pipeline...")
     credentials, project_id = google.auth.default()
 
-    openai_api_key = os.environ.get('openai_api_key', 'Missing environment variable')
+    openai_api_key = os.environ.get('OPENAI_API_KEY', 'Missing environment variable')
 
     drafts_source_table = f"{project_id}.platform_drafts.drafts_modelled"
     drafts_target_table = f"{project_id}.platform_drafts.drafts_enriched"

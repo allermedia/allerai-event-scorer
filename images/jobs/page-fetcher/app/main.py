@@ -39,4 +39,3 @@ if __name__ == "__main__":
         raise ValueError("from_date cannot be after to_date")
     
     run_pipeline(from_date=from_date, to_date=to_date)
-    

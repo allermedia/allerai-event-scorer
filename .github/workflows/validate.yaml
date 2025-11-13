@@ -22,12 +22,6 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA }}
 
-      - name: Validate scorer Docker build
-        run: docker build event_scorer
-
-      - name: Validate event_handler Docker build
-        run: docker build event_handler
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
@@ -43,7 +37,11 @@ jobs:
         run: |
           ENV_VARS="{
             TARGET_PROJECT_ID = \"${{ secrets.ADP_PROJECT_ID }}\",
-            OUTPUT_TOPIC = \"${{ secrets.ADP_ENRICHMENT_TOPIC }}\"
+            OUTPUT_TOPIC = \"${{ secrets.ADP_ENRICHMENT_TOPIC }}\",
+            MONGO_URI = \"${{ secrets.MONGO_URI_DRAFTS }}\",
+            MONGO_DB = \"${{ secrets.MONGO_DB_DRAFTS }}\",
+            MONGO_COLLECTION = \"${{ secrets.MONGO_COLLECTION_DRAFTS }}\",
+            OPENAI_API_KEY = \"${{ secrets.OPENAI_API_KEY }}\"
           }"
           terraform plan -var="env_vars=${ENV_VARS}"
         working-directory: terraform
