@@ -54,4 +54,4 @@ else
 fi
 
 # Output for GitHub Actions
-echo "::set-output name=matrix::$MATRIX_JSON"
+echo "matrix=$MATRIX_JSON" >> $GITHUB_OUTPUT
