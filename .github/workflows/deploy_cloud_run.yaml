@@ -34,7 +34,7 @@ jobs:
 
   build-and-deploy:
     needs: detect-changed
-    if: ${{ fromJSON(needs.detect-changes.outputs.matrix).images[0] != null }}
+    if: ${{ fromJSON(needs.detect-changed.outputs.matrix) != '[]' }}
     runs-on: ubuntu-latest
     strategy:
       matrix: ${{ fromJSON(needs.detect-changed.outputs.matrix || '[]') }}
