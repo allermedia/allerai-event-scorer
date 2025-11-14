@@ -1,10 +1,9 @@
 # Editorial AI Data Platform
 
-This project defines data integrations for the Editorial AI team, targeting the Editorial AI Platform.
+This project defines data integrations for the **Editorial AI** team, targeting the **Editorial AI Platform**.
 
 It uses Terraform to manage and provision resources, ensuring consistent and reproducible deployments.
 
-it contains **data pipelines, ML services, and infrastructure code** to fetch, model, and export data to the editorial ai platform.
 It is designed as a central hub for multiple integrations, each with its own pipelines, ML models, and deployment configuration.
 
 Therefore the repo is **organized by services**, not by integrations:
