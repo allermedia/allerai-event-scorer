@@ -4,9 +4,6 @@ set -euo pipefail
 EVENT_NAME=$1
 CHANGED_FILES=$2
 
-echo "EVENT_NAME='$EVENT_NAME'"
-echo "CHANGED_FILES='$CHANGED_FILES'"
-
 CHANGED_IMAGES=()
 
 add_to_matrix() {
