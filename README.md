@@ -1,4 +1,4 @@
-# Data Platform Repo
+# Editorial AI Data Platform
 
 This repository contains **data pipelines, ML services, and infrastructure code** to fetch, model, and export data to the editorial ai platform. It is designed as a central hub for multiple integrations, each with its own pipeline, ML models, and deployment configuration.
 
