@@ -4,6 +4,9 @@ set -euo pipefail
 EVENT_NAME=$1
 CHANGED_FILES=$2
 
+echo "EVENT_NAME='$EVENT_NAME'"
+echo "CHANGED_FILES='$CHANGED_FILES'"
+
 CHANGED_IMAGES=()
 
 add_to_matrix() {
@@ -35,16 +38,21 @@ else
 fi
 
 # Build JSON using jq for safety
-ITEMS=()
+ITEMS_JSON=()
 for IMG in "${CHANGED_IMAGES[@]}"; do
   TYPE=$(echo "$IMG" | cut -d/ -f1)
   NAME=$(echo "$IMG" | cut -d/ -f2)
   FOLDER="images/$TYPE/$NAME"
-  ITEMS+=($(jq -n --arg type "$TYPE" --arg name "$NAME" --arg folder "$FOLDER" \
-             '{type:$type,name:$name,folder:$folder}'))
+  ITEMS_JSON+=("$(jq -n --arg type "$TYPE" --arg name "$NAME" --arg folder "$FOLDER" \
+                 '{type:$type,name:$name,folder:$folder}')")
 done
 
-MATRIX_JSON=$(jq -n --argjson items "[${ITEMS[*]}]" '$items')
+# If no images, produce an empty array
+if [ ${#ITEMS_JSON[@]} -eq 0 ]; then
+  MATRIX_JSON="[]"
+else
+  MATRIX_JSON=$(jq -s '.' <<< "${ITEMS_JSON[*]}")
+fi
 
 # Debug: print matrix for logs
 echo "Changed images matrix:"
