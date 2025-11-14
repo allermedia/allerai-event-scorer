@@ -34,7 +34,7 @@ jobs:
 
   build-and-deploy:
     needs: detect-changed
-    if: ${{ fromJSON(needs.detect-changed.outputs.matrix) != '' && fromJSON(needs.detect-changed.outputs.matrix) != [] }}
+    if: ${{ fromJSON(needs.detect-changed.outputs.matrix).length > 0 }}
     runs-on: ubuntu-latest
 
     strategy:
