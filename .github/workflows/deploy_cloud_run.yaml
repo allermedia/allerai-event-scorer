@@ -30,7 +30,9 @@ jobs:
       - name: Build matrix
         id: set-matrix
         run: |
-          bash .github/workflows/scripts/changed_images.sh "${{ github.event_name }}" "${{ steps.changed-files.outputs.all_changed_files }}"
+          bash .github/workflows/scripts/changed_images.sh \
+            "${{ github.event_name }}" \
+            "${{ steps.changed-files.outputs.all_changed_files || '' }}"
 
   build-and-deploy:
     needs: detect-changed
