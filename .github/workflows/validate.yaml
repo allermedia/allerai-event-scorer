@@ -6,8 +6,7 @@ on:
       - main
     paths:
       - "terraform/**"
-      - "images/**"
-      - ".github/workflows/**"
+      - ".github/workflows/deploy_infra.yaml"
 
 jobs:
   validate:
