@@ -43,9 +43,6 @@ jobs:
           echo "Raw detect-changed matrix output:"
           echo "${{ needs.detect-changed.outputs.matrix }}"
 
-          echo "Parsed JSON length:"
-          echo "${{ fromJSON(needs.detect-changed.outputs.matrix) | length }}"
-
   build-and-deploy:
     needs: detect-changed
     if: ${{ fromJSON(needs.detect-changed.outputs.matrix).length > 0 }}
