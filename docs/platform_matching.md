@@ -4,19 +4,19 @@ This repository contains data pipelines and supporting code for managing page dr
 
 ### Repository Structure
 
-- **`images/jobs/draft_fetcher`**  
+- **`images/jobs/draft-fetcher`**  
   Pipeline for fetching article drafts from the AI platform. This pipeline extracts draft data and loads it into **Bigquery**.
 
-- **`images/jobs/page_fetcher`**  
+- **`images/jobs/page-fetcher`**  
   Pipeline for fetching published pages from various brand sites. This pipeline extracts published pages and loads it into **Bigquery**.
 
-- **`images/jobs/pageviewfetcher`**  
+- **`images/jobs/pageview-fetcher`**  
   Pipeline for fetching pageviews from pages from various brand sites. This pipeline extracts pageviews and loads it into **Bigquery**.
 
-- **`images/jobs/data_enrichment`**  
+- **`images/jobs/data-enrichment`**  
   Pipeline for vectorizing pages and drafts. This pipeline extracts published pages and drafts and enriches them, then loads it into **Bigquery**.
 
-- **`images/jobs/matching_service`**  
+- **`images/jobs/matching-service`**  
   Python code for matching published pages with drafts.
 
 ### Deployment
