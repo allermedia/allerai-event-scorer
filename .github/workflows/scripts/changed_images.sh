@@ -47,16 +47,15 @@ for IMG in "${CHANGED_IMAGES[@]}"; do
                  '{type:$type,name:$name,folder:$folder}')")
 done
 
-# If no images, produce an empty array
 if [ ${#ITEMS_JSON[@]} -eq 0 ]; then
   MATRIX_JSON="[]"
 else
-  MATRIX_JSON=$(jq -s '.' <<< "${ITEMS_JSON[*]}")
+  MATRIX_JSON=$(printf "%s\n" "${ITEMS_JSON[@]}" | jq -s '.')
 fi
 
-# Debug: print matrix for logs
+# Debug
 echo "Changed images matrix:"
 echo "$MATRIX_JSON" | jq .
 
-# Output to GitHub Actions
+# Output to GitHub Actions (compact JSON)
 echo "matrix=$(echo "$MATRIX_JSON" | jq -c '.')" >> $GITHUB_OUTPUT
