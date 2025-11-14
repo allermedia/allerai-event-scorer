@@ -45,7 +45,12 @@ jobs:
       - name: Debug detect-changed output
         run: |
           echo "Raw detect-changed matrix output:"
-          echo "${{ fromJSON(needs.detect-changed.outputs.matrix) }}"
+          echo "${{ fromJSON(needs.detect-changed.outputs.matrix).images }}"
+
+          echo "Parsed images:"
+          for image in ${{ fromJSON(needs.detect-changed.outputs.matrix).images }}; do
+            echo "$image"
+          done
 
   build-and-deploy:
     needs: detect-changed
