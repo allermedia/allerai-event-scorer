@@ -8,10 +8,10 @@ This repository contains **data pipelines, ML services, and infrastructure code*
 
 This repo contains multiple integrations, which are explained later in this readme.
 
-| Integration       | Description                                                                                                                       |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| **Integration A** | A two-part pipeline that ingests events, enriches them, and calculates relevance scores and traffic estimates for downstream use. |
-| **Integration B** | Manages page drafts and published pages, along with a matching system to link published pages to drafts.                          |
+| Integration           | Description                                                                                                                       |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **Page Scorer**       | A two-part pipeline that ingests events, enriches them, and calculates relevance scores and traffic estimates for downstream use. |
+| **Platform Matching** | Manages page drafts and published pages, along with a matching system to link published pages to drafts.                          |
 
 ---
 
