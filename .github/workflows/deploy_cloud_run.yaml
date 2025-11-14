@@ -30,9 +30,11 @@ jobs:
       - name: Build matrix
         id: set-matrix
         run: |
-          bash .github/workflows/scripts/changed_images.sh \
+          MATRIX_OUTPUT=$(bash .github/workflows/scripts/changed_images.sh \
             "${{ github.event_name }}" \
-            "${{ steps.changed-files.outputs.all_changed_files || '' }}"
+            "${{ steps.changed-files.outputs.all_changed_files || '' }}")
+
+          echo "$MATRIX_OUTPUT" >> $GITHUB_OUTPUT
 
   verify-matrix:
     needs: detect-changed

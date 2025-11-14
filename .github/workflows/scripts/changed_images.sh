@@ -47,9 +47,4 @@ else
         'map({type: (split("/")[0]), name: (split("/")[1]), folder: ("images/" + split("/")[0] + "/" + split("/")[1])})')
 fi
 
-# Debug
-echo "Changed images matrix:"
-echo "$MATRIX_JSON" | jq .
-
-# Output matrix to GitHub Actions
-echo "matrix=$MATRIX_JSON" >> $GITHUB_OUTPUT
+echo "$MATRIX_JSON"
