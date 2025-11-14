@@ -23,6 +23,8 @@ locals {
 resource "google_cloud_run_v2_job" "jobs" {
   for_each = local.cloudrun_jobs_merged
 
+  deletion_protection = false
+
   name     = each.value.name
   location = each.value.location
 
