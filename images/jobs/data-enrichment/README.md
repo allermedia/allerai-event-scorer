@@ -24,8 +24,7 @@ This application processes **drafts** and **pages** data by normalizing text, cr
 
 Set these environment variables before running:
 
-- `openai_api_key`: OpenAI API key for embedding service
-- `project_id`: BigQuery project_id for reading/writing data
+- `OPENAI_API_KEY`: OpenAI API key for embedding service
 
 ## ⚙️ Batch Processing
 
