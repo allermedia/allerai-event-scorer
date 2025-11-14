@@ -57,5 +57,6 @@ fi
 echo "Changed images matrix:"
 echo "$MATRIX_JSON" | jq .
 
-# Output to GitHub Actions (compact JSON)
-echo "matrix=$(echo "$MATRIX_JSON" | jq -c '.')" >> $GITHUB_OUTPUT
+echo "matrix<<EOF" >> $GITHUB_OUTPUT
+echo "$MATRIX_JSON" >> $GITHUB_OUTPUT
+echo "EOF" >> $GITHUB_OUTPUT
