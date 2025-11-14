@@ -38,25 +38,18 @@ else
 fi
 
 # Build JSON using jq for safety
-ITEMS_JSON=()
-for IMG in "${CHANGED_IMAGES[@]}"; do
-  TYPE=$(echo "$IMG" | cut -d/ -f1)
-  NAME=$(echo "$IMG" | cut -d/ -f2)
-  FOLDER="images/$TYPE/$NAME"
-  ITEMS_JSON+=("$(jq -n --arg type "$TYPE" --arg name "$NAME" --arg folder "$FOLDER" \
-                 '{type:$type,name:$name,folder:$folder}')")
-done
-
-if [ ${#ITEMS_JSON[@]} -eq 0 ]; then
-  MATRIX_JSON="[]"
+if [ ${#CHANGED_IMAGES[@]} -eq 0 ]; then
+  MATRIX_JSON='[]'
 else
-  MATRIX_JSON=$(printf "%s\n" "${ITEMS_JSON[@]}" | jq -s '.')
+  MATRIX_JSON=$(printf '%s\n' "${CHANGED_IMAGES[@]}" \
+    | jq --raw-input . \
+    | jq --compact-output --slurp \
+        'map({type: (split("/")[0]), name: (split("/")[1]), folder: ("images/" + split("/")[0] + "/" + split("/")[1])})')
 fi
 
 # Debug
 echo "Changed images matrix:"
 echo "$MATRIX_JSON" | jq .
 
-echo "matrix<<EOF" >> $GITHUB_OUTPUT
-echo "$MATRIX_JSON" >> $GITHUB_OUTPUT
-echo "EOF" >> $GITHUB_OUTPUT
+# Output matrix to GitHub Actions
+echo "matrix=$MATRIX_JSON" >> $GITHUB_OUTPUT
