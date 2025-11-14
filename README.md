@@ -1,10 +1,27 @@
-# Event Scoring Integration
+# Data Platform Repo
+
+This repository contains **data pipelines, ML services, and infrastructure code** to fetch, model, and export data to the editorial ai platform. It is designed as a central hub for multiple integrations, each with its own pipeline, ML models, and deployment configuration.
+
+---
+
+## Integrations
+
+This repo contains multiple integrations, which are explained later in this readme.
+
+| Integration       | Description                                                                                                                       |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **Integration A** | A two-part pipeline that ingests events, enriches them, and calculates relevance scores and traffic estimates for downstream use. |
+| **Integration B** | Manages page drafts and published pages, along with a matching system to link published pages to drafts.                          |
+
+---
+
+## Event Scoring Integration
 
 This repository contains the **Event Scoring Integration**, a two-part pipeline that ingests events, enriches them, and calculates relevance scores and traffic estimates for downstream use.
 
 ---
 
-## 🚀 Overview
+### 🚀 Overview
 
 This integration can be visualized in below chart:
 ![Event Scorer](event_scorer_flow.png)
@@ -58,7 +75,7 @@ Uses historical traffic numbers from ADP to estimate pageview ranges.
 
 ---
 
-## ✅ Output
+### ✅ Output
 
 Each event processed by the integration produces a **scored payload** containing features for each domain:
 
@@ -73,7 +90,7 @@ person_tags: <recognized_entities>
 
 ---
 
-## 🛠️ Tech Stack
+### 🛠️ Tech Stack
 
 - **Google Cloud Pub/Sub** – Event transport
 - **Google Cloud Run** – Ingestion and validation service
@@ -81,7 +98,7 @@ person_tags: <recognized_entities>
 - **BigQuery** – Storage of enriched events, historical traffic, and comparison events
 - **Python** – Event Scorer implementation
 
-## 📝 Usage
+### 📝 Usage
 
 ### 1. Publishing an Event
 
@@ -123,34 +140,34 @@ The integration will deliver a scored payload in the following structure:
 }
 ```
 
-# 📄 Aller AI Platform Matching
+## 📄 Aller AI Platform Matching
 
 This repository contains data pipelines and supporting code for managing page drafts and published pages, along with a matching system to link published pages to drafts.
 
-## Repository Structure
+### Repository Structure
 
-- **`pipelines/draft_fetcher`**  
+- **`images/jobs/draft_fetcher`**  
   Pipeline for fetching article drafts from the AI platform. This pipeline extracts draft data and loads it into **Bigquery**.
 
-- **`pipelines/page_fetcher`**  
+- **`images/jobs/page_fetcher`**  
   Pipeline for fetching published pages from various brand sites. This pipeline extracts published pages and loads it into **Bigquery**.
 
-- **`pipelines/pageviewfetcher`**  
+- **`images/jobs/pageviewfetcher`**  
   Pipeline for fetching pageviews from pages from various brand sites. This pipeline extracts pageviews and loads it into **Bigquery**.
 
-- **`data_enrichment`**  
+- **`images/jobs/data_enrichment`**  
   Pipeline for vectorizing pages and drafts. This pipeline extracts published pages and drafts and enriches them, then loads it into **Bigquery**.
 
-- **`matching_service`**  
+- **`images/jobs/matching_service`**  
   Python code for matching published pages with drafts.
 
-## Deployment
+### Deployment
 
 All pipelines are containerized using Docker and deployed on Google Cloud Run. The deployment and configuration details are managed via GitHub Actions workflows, defined in the repository’s `.github/workflows/` directory.
 
 ---
 
-## Getting Started
+### Getting Started
 
 1. **Docker & Cloud Run**  
    Build and deploy containers using the provided GitHub workflows or manually via Docker and `gcloud` CLI.
@@ -161,12 +178,12 @@ All pipelines are containerized using Docker and deployed on Google Cloud Run. T
 
 ---
 
-## Additional Information
+### Additional Information
 
 - The pipelines leverage the [dlt](https://dlt.dev/) framework for efficient and incremental data loading.
 - The matching code helps maintain consistency between draft content and live published pages for better editorial workflow insights.
 
-## 🗺️ Application Flow
+### 🗺️ Application Flow
 
 Here is a visual overview of the application's workflow:
 
