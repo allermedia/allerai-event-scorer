@@ -39,12 +39,11 @@ fi
 
 # Build JSON using jq for safety
 if [ ${#CHANGED_IMAGES[@]} -eq 0 ]; then
-  MATRIX_JSON='[]'
+  echo 'matrix={"images":[]}'
 else
   MATRIX_JSON=$(printf '%s\n' "${CHANGED_IMAGES[@]}" \
     | jq --raw-input . \
     | jq --compact-output --slurp \
         'map({type: (split("/")[0]), name: (split("/")[1]), folder: ("images/" + split("/")[0] + "/" + split("/")[1])})')
+    echo "matrix={"images":$MATRIX_JSON}"
 fi
-
-echo "$MATRIX_JSON"
