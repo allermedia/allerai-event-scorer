@@ -33,6 +33,8 @@ jobs:
           MATRIX_OUTPUT=$(bash .github/workflows/scripts/changed_images.sh \
             "${{ github.event_name }}" \
             "${{ steps.changed-files.outputs.all_changed_files || '' }}")
+          echo "Matrix output:"
+          echo "$MATRIX_OUTPUT"
 
           echo "$MATRIX_OUTPUT" >> $GITHUB_OUTPUT
 
@@ -43,16 +45,16 @@ jobs:
       - name: Debug detect-changed output
         run: |
           echo "Raw detect-changed matrix output:"
-          echo "${{ needs.detect-changed.outputs.matrix }}"
+          echo "${{ fromJSON(needs.detect-changed.outputs.matrix) }}"
 
   build-and-deploy:
     needs: detect-changed
-    if: ${{ fromJSON(needs.detect-changed.outputs.matrix).length > 0 }}
+    if: ${{ fromJSON(needs.detect-changes.outputs.matrix).images[0] != null }}
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        image: ${{ fromJSON(needs.detect-changed.outputs.matrix) }}
+        image: ${{ fromJSON(needs.detect-changed.outputs.matrix).images }}
 
     steps:
       - name: Checkout code
