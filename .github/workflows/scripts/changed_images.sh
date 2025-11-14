@@ -47,7 +47,7 @@ done
 MATRIX_JSON=$(jq -n --argjson items "[${ITEMS[*]}]" '$items')
 
 # Debug: print matrix for logs
-echo "🟢 Changed images matrix:"
+echo "Changed images matrix:"
 echo "$MATRIX_JSON" | jq .
 
 # Output to GitHub Actions
