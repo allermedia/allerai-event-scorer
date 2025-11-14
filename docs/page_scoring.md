@@ -1,6 +1,6 @@
 ## Page Scoring Scoring Integration
 
-This repository contains the **Event Scoring Integration**, a two-part pipeline that ingests events, enriches them, and calculates relevance scores and traffic estimates for downstream use.
+This repository contains the **Page Scoring Integration**, a two-part pipeline that ingests events, enriches them, and calculates relevance scores and traffic estimates for downstream use.
 
 ---
 
