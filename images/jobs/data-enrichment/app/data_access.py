@@ -63,7 +63,7 @@ class DataAccess():
         query_job = self.client.query(sql)
         df = query_job.to_dataframe()
         return df
-        
+
 
     def bigquery_write(self, df: DataFrame, target_table: str):
         job = self.client.load_table_from_dataframe(
@@ -75,7 +75,7 @@ class DataAccess():
         )
         job.result() 
         print(f"Inserted {job.output_rows} rows into {target_table}")
-    
+
     def normalize_text_column(self, df: pd.DataFrame, column: str, new_column: str = None) -> pd.DataFrame:
         def normalize(text):
             if pd.isnull(text):
@@ -88,11 +88,11 @@ class DataAccess():
             text = re.sub(r'[^a-z0-9\s]', ' ', text)
             text = re.sub(r'\s+', ' ', text)
             return text.strip()
-    
+
         target_column = new_column or column
         df[target_column] = df[column].apply(normalize)
         return df
-    
+
     def embed_and_store(self, df: pd.DataFrame, input_column: str, name: str, embedder, da, target_table) -> Optional[pd.DataFrame]:
         if df.empty:
             print(f"No new {name}")
