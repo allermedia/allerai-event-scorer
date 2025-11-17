@@ -1,4 +1,4 @@
-name: Validate Docker and Terraform on PR
+name: Validate Terraform on PR
 
 on:
   pull_request:
@@ -37,14 +37,14 @@ jobs:
       - name: Terraform Plan (no apply)
         run: |
           ENV_VARS="{
-            TARGET_PROJECT_ID = \"${{ secrets.ADP_PROJECT_ID }}\",
-            OUTPUT_TOPIC = \"${{ secrets.ADP_ENRICHMENT_TOPIC }}\",
-            PLATFORM_API_KEY = \"${{ secrets.PLATFORM_API_KEY }}\",
-            PLATFORM_ENDPOINT = \"${{ secrets.PLATFORM_ENDPOINT }}\",
-            MONGO_URI = \"${{ secrets.MONGO_URI_DRAFTS }}\",
-            MONGO_DB = \"${{ secrets.MONGO_DB_DRAFTS }}\",
-            MONGO_COLLECTION = \"${{ secrets.MONGO_COLLECTION_DRAFTS }}\",
-            OPENAI_API_KEY = \"${{ secrets.OPENAI_API_KEY }}\",
+            \"TARGET_PROJECT_ID\": \"${{ secrets.ADP_PROJECT_ID }}\",
+            \"OUTPUT_TOPIC\": \"${{ secrets.ADP_ENRICHMENT_TOPIC }}\",
+            \"PLATFORM_API_KEY\": \"${{ secrets.PLATFORM_API_KEY }}\",
+            \"PLATFORM_ENDPOINT\": \"${{ secrets.PLATFORM_ENDPOINT }}\",
+            \"MONGO_URI\": \"${{ secrets.MONGO_URI_DRAFTS }}\",
+            \"MONGO_DB\": \"${{ secrets.MONGO_DB_DRAFTS }}\",
+            \"MONGO_COLLECTION\": \"${{ secrets.MONGO_COLLECTION_DRAFTS }}\",
+            \"OPENAI_API_KEY\": \"${{ secrets.OPENAI_API_KEY }}\"
           }"
           terraform plan -var="env_vars=${ENV_VARS}"
         working-directory: terraform
