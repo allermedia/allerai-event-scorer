@@ -40,7 +40,7 @@ jobs:
             MONGO_URI = \"${{ secrets.MONGO_URI_DRAFTS }}\",
             MONGO_DB = \"${{ secrets.MONGO_DB_DRAFTS }}\",
             MONGO_COLLECTION = \"${{ secrets.MONGO_COLLECTION_DRAFTS }}\",
-            OPENAI_API_KEY = \"${{ secrets.OPENAI_API_KEY }}\"
+            OPENAI_API_KEY = \"${{ secrets.OPENAI_API_KEY }}\",
           }"
           terraform plan -var="env_vars=${ENV_VARS}"
         working-directory: terraform
@@ -55,7 +55,7 @@ jobs:
             MONGO_URI = \"${{ secrets.MONGO_URI_DRAFTS }}\",
             MONGO_DB = \"${{ secrets.MONGO_DB_DRAFTS }}\",
             MONGO_COLLECTION = \"${{ secrets.MONGO_COLLECTION_DRAFTS }}\",
-            OPENAI_API_KEY = \"${{ secrets.OPENAI_API_KEY }}\"
+            OPENAI_API_KEY = \"${{ secrets.OPENAI_API_KEY }}\",
           }"
           terraform apply -auto-approve -var="env_vars=${ENV_VARS}"
         working-directory: terraform
