@@ -1,6 +1,6 @@
 from langchain_openai import OpenAIEmbeddings
 from data_access import DataAccess
-from google.auth
+import google.auth
 import os
 
 def run_pipeline():    
