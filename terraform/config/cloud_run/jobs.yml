@@ -2,7 +2,7 @@
   image: data-enrichment
   service_account: aller-ai-sa@aller-content-tool.iam.gserviceaccount.com
   env_vars:
-    - openai_api_key
+    - OPENAI_API_KEY
 
 - name: draft-fetcher
   image: draft-fetcher
@@ -23,3 +23,10 @@
 - name: matching-service
   image: matching-service
   service_account: aller-ai-sa@aller-content-tool.iam.gserviceaccount.com
+#- name: traffix-exporter
+#  image: traffix-exporter
+#  service_account: aller-ai-sa@aller-content-tool.iam.gserviceaccount.com
+#  env_vars:
+#    - ADP_PROJECT_ID
+#    - PLATFORM_API_KEY
+#    - PLATFORM_TRAFFIC_ENDPOINT
