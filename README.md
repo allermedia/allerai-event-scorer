@@ -22,6 +22,9 @@ This repo contains multiple integrations, which are explained in separate docume
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
 | **Page Scoring**      | A two-part pipeline that ingests events, enriches them, and calculates relevance scores and traffic estimates for downstream use. | [Page Scoring Docs](docs/page_scoring.md)           |
 | **Platform Matching** | Manages page drafts and published pages, along with a matching system to link published pages to drafts.                          | [Platform Matching Docs](docs/platform_matching.md) |
-| **Pageview exporter** | Exports pageviews from all brandsites to the editorial platform.                                                                  | [Pageview exporter](docs/pageview_exporter.md)      |
+| **Traffic exporter**  | Exports traffic from all brandsites to the editorial platform.                                                                    | [Traffic exporter Docs](docs/traffic_exporter.md)   |
+
+Part of the Editorial AI Team is the Nordic AI Newsletters, which lives in another repository as it is currently paused, but is part of the same team:
+https://github.com/allermedia/nordic-ai-newsletters
 
 ---
