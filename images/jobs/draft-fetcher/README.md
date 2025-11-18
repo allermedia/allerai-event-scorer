@@ -13,9 +13,9 @@ This application provides a pipeline to fetch draft metadata from a **Mongo DB**
 ## 🚀 Deployment
 
 - Container is deployed to cloud run as a job
-- Deployment specifications are configured in **workflows**
+- Deployment specifications are configured in **Terraform**
 
 ## 🟢 Trigger
 
 - Triggered weekly on **Mondays at 6 AM** via **Cloud Scheduler**
-- Cloud Scheduler trigger is configured **workflows**.
+- Cloud Scheduler trigger is configured **Terraform**.

@@ -12,12 +12,12 @@ This application processes **page/draft embeddings** to find pages origining fro
 ## 🚀 Deployment
 
 - Container is deployed to cloud run as a job
-- Deployment specifications are configured in **workflows**
+- Deployment specifications are configured in **Terraform**
 
 ## 🟢 Trigger
 
 - Triggered weekly on **Mondays at 8 AM** via **Cloud Scheduler**
-- Cloud Scheduler trigger is configured **workflows**.
+- Cloud Scheduler trigger is configured **Terraform**.
 
 ## ⚙️ CLI Backfill Support
 

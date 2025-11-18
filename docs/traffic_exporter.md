@@ -1,6 +1,6 @@
 -
 
-## 📄 Aller AI Platform Matching
+## 📄 Aller AI Traffic Exporter
 
 This repository contains the data pipeline for forwarding page traffic data to the Editorial AI Platform.
 

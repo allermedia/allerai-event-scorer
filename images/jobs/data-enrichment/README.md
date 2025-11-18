@@ -18,7 +18,7 @@ This application processes **drafts** and **pages** data by normalizing text, cr
 ## 🟢 Trigger
 
 - Triggered weekly on **Mondays at 7 AM** via **Cloud Scheduler**
-- Cloud Scheduler trigger is configured **workflows**.
+- Cloud Scheduler trigger is configured **Terraform**.
 
 ## 🔧 Environment Variables
 
