@@ -13,12 +13,12 @@ This application defines a DLT pipeline that fetches **pageviews for published p
 ## 🚀 Deployment
 
 - The application is deployed as a **Cloud Run job**
-- Deployment and schedule are configured in **Workflows**
+- Deployment and schedule are configured in **Terraform**
 
 ## 🟢 Trigger
 
 - Triggered weekly on **Mondays at 6 AM** via **Cloud Scheduler**
-- Cloud Scheduler trigger is configured **workflows**.
+- Cloud Scheduler trigger is configured **Terraform**.
 
 ## 🔐 Secret Management
 
