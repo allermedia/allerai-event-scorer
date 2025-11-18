@@ -27,3 +27,8 @@ matching-service-weekly:
   job_name: matching-service
   schedule: "0 8 * * 1"
   time_zone: Europe/Copenhagen
+#traffix-exporter-weekly:
+#  description: Triggers the traffix-exporter job weekly at 2 AM every day.
+#  job_name: traffix-exporter
+#  schedule: "0 2 * * *"
+#  time_zone: Europe/Copenhagen
